@@ -49,6 +49,9 @@ def strip_tweet(text):
 
 
 def learning_daemon(token):
+    if not isinstance(token, tweepy.oauth.OAuthToken):
+        token = tweepy.oauth.OAuthToken.from_string(token)
+
     auth.set_access_token(token.key, token.secret)
     listener = MyMentionListener()
 
