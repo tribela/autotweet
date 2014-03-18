@@ -4,6 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
+GRAM_LENGTH = 2
 
 
 association_table = Table(
@@ -41,3 +42,17 @@ def init_db(url):
     Base.metadata.create_all(engine)
 
     return db_session
+
+
+def add_document(session, question, answer):
+    grams = set()
+    for i in range(len(question - GRAM_LENGTH + 1)):
+        gram = question[i:i+GRAM_LENGTH]
+        gram = session.query(Gram).filter_by(gram=gram).first() or Gram(gram)
+        session.add(Gram)
+        grams.add(gram)
+
+    doc = Document(question, answer)
+    doc.grams = grams
+
+    session.commit()
