@@ -62,8 +62,8 @@ def learning_daemon(token):
     stream.userstream(async=True)
 
     try:
-        while time.sleep(10):
-            pass
+        while 1:
+            time.sleep(10)
     except KeyboardInterrupt:
         print('Quit...')
         stream.disconnect()
