@@ -14,9 +14,10 @@ mention_pattern = re.compile(r'@\w+')
 
 class MyMentionListener(tweepy.streaming.StreamListener):
 
-    def __init__(self, me):
+    def __init__(self, me, session):
         super(MyMentionListener, self).__init__()
         self.me = me
+        self.session = session
 
     def on_status(self, status):
         if hasattr(status,'retweeted_status'):
@@ -28,10 +29,8 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             question = strip_tweet(original_status.text)
             answer = strip_tweet(status.text)
 
-            if not question or not answer:
-                return True
-
-            #TODO: Add document, gram to database
+            if question and answer:
+                add_document(question, answer)
 
         return True
 
@@ -54,14 +53,14 @@ def strip_tweet(text):
     return text
 
 
-def learning_daemon(token):
+def learning_daemon(token, session):
     if not isinstance(token, tweepy.oauth.OAuthToken):
         token = tweepy.oauth.OAuthToken.from_string(token)
 
     auth.set_access_token(token.key, token.secret)
     api = tweepy.API(auth)
 
-    listener = MyMentionListener(api.me())
+    listener = MyMentionListener(api.me(), session)
 
     stream = tweepy.Stream(auth, listener)
     stream.userstream(async=True)
