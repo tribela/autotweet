@@ -18,7 +18,7 @@ class MyMentionListener(tweepy.streaming.StreamListener):
         super(MyMentionListener, self).__init__()
         self.me = me
 
-    def on_update(self, status):
+    def on_status(self, status):
         if status.user.id == self.me.id and status.in_reply_to_status_id:
             original_status = self.api.get_status(status.in_reply_to_status_id)
 
