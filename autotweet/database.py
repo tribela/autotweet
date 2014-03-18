@@ -53,6 +53,6 @@ def add_document(session, question, answer):
         grams.add(gram)
 
     doc = Document(question, answer)
-    doc.grams = grams
+    doc.grams = list(grams)
 
     session.commit()
