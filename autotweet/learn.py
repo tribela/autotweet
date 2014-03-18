@@ -20,7 +20,7 @@ class MyMentionListener(tweepy.streaming.StreamListener):
         self.session = session
 
     def on_status(self, status):
-        if hasattr(status,'retweeted_status'):
+        if hasattr(status, 'retweeted_status'):
             return True
 
         if status.user.id == self.me.id and status.in_reply_to_status_id:
