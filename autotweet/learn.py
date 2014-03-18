@@ -3,6 +3,8 @@ import re
 import time
 import tweepy
 
+from .database import add_document
+
 CONSUMER_KEY = '62yWrV2RhpGgWOKlqvJPNQ'
 CONSUMER_SECRET = 'Je6NLI7AN3c1BJP9kHaq1p8GBkMyKs5GhX954dWJ6I'
 
@@ -31,7 +33,7 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             answer = strip_tweet(status.text)
 
             if question and answer:
-                add_document(question, answer)
+                add_document(self.session, question, answer)
 
         return True
 
