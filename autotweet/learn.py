@@ -48,8 +48,8 @@ def authorize():
 
 
 def strip_tweet(text):
-    text = url_pattern.sub(text, '')
-    text = mention_pattern.sub(text, '')
+    text = url_pattern.sub('', text)
+    text = mention_pattern.sub('', text)
     text = text.strip()
     return text
 
