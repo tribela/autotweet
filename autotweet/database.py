@@ -76,6 +76,13 @@ def get_idf(session, gram):
     return math.log((all_count / (1.0 + d_count)) + 1)
 
 
+def get_tf_idfs(document):
+    tf_idfs = {}
+    for gram in document.grams:
+        tf_idfs[gram.gram] = get_tf(gram, document) * gram.idf
+    return tf_idfs
+
+
 def cosine_measure(v1, v2):
     intersection = set(v1.keys()) & set(v2.keys())
     numerator = sum([v1[x] * v2[x] for x in intersection])
@@ -103,12 +110,9 @@ def get_best_answer(session, query):
     idfs = dict((gram.gram, gram.idf) for gram in grams)
 
     documents = session.query(Document).all()
-    for doc in documents:
-        tf_idfs = {}
-        for gram in doc.grams:
-            tf_idfs[gram.gram] = get_tf(gram, doc) * gram.idf
-
-        docs[doc.answer] = cosine_measure(idfs, tf_idfs)
+    docs = dict((doc.answer, cosine_measure(idfs, get_tf_idfs(doc)))
+                for doc in documents)
+    docs = dict((key, val) for (key, val) in docs.items() if val)
 
     try:
         return max(docs, key=docs.get)
