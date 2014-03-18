@@ -17,7 +17,7 @@ def readme():
         return ''
 
 
-install_requires = ['tweepy']
+install_requires = ['sqlalchemy', 'tweepy']
 if sys.version_info < (3, 2):
     install_requires.append('futures')
 
