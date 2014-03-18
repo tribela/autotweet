@@ -47,6 +47,11 @@ def init_db(url):
 
 
 def add_document(session, question, answer):
+    _add_doc(session, question, answer)
+    _recalc_idfs(session)
+
+
+def _add_doc(session, question, answer):
     grams = set()
     for i in range(len(question) - GRAM_LENGTH + 1):
         gram = question[i:i+GRAM_LENGTH]
@@ -57,6 +62,10 @@ def add_document(session, question, answer):
     doc = Document(question, answer)
     doc.grams = list(grams)
 
+    session.commit()
+
+
+def _recalc_idfs(session):
     for gram in session.query(Gram).all():
         gram.idf = get_idf(session, gram)
 
