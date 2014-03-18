@@ -1,4 +1,4 @@
-from aqlalchemy import Column, ForeignKey, Integer, String, Table, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, create_engine
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -20,7 +20,7 @@ class Document(Base):
     text = Column(String, nullable=False)
     answer = Column(String, nullable=False)
     grams = relationship(
-        'Gram', secondary_association_table, backref='documents')
+        'Gram', secondary=association_table, backref='documents')
 
     def __init__(self, text, answer):
         self.text = text
@@ -46,10 +46,10 @@ def init_db(url):
 
 def add_document(session, question, answer):
     grams = set()
-    for i in range(len(question - GRAM_LENGTH + 1)):
+    for i in range(len(question) - GRAM_LENGTH + 1):
         gram = question[i:i+GRAM_LENGTH]
         gram = session.query(Gram).filter_by(gram=gram).first() or Gram(gram)
-        session.add(Gram)
+        session.add(gram)
         grams.add(gram)
 
     doc = Document(question, answer)
