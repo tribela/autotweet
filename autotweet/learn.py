@@ -19,6 +19,9 @@ class MyMentionListener(tweepy.streaming.StreamListener):
         self.me = me
 
     def on_status(self, status):
+        if hasattr(status,'retweeted_status'):
+            return True
+
         if status.user.id == self.me.id and status.in_reply_to_status_id:
             original_status = self.api.get_status(status.in_reply_to_status_id)
 
@@ -26,9 +29,11 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             answer = strip_tweet(status.text)
 
             if not question or not answer:
-                return
+                return True
 
             #TODO: Add document, gram to database
+
+        return True
 
 
 def authorize():
