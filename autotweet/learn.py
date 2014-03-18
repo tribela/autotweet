@@ -14,11 +14,12 @@ mention_pattern = re.compile(r'@\w+')
 
 class MyMentionListener(tweepy.streaming.StreamListener):
 
-    def on_connect(self):
-        self.my_id = self.api.me().id
+    def __init__(self, me):
+        super(MyMentionListener, self).__init__()
+        self.me = me
 
     def on_update(self, status):
-        if status.user.id == self.my_id and status.in_reply_to_status_id:
+        if status.user.id == self.me.id and status.in_reply_to_status_id:
             original_status = self.api.get_status(status.in_reply_to_status_id)
 
             question = strip_tweet(original_status.text)
@@ -53,7 +54,9 @@ def learning_daemon(token):
         token = tweepy.oauth.OAuthToken.from_string(token)
 
     auth.set_access_token(token.key, token.secret)
-    listener = MyMentionListener()
+    api = tweepy.API(auth)
+
+    listener = MyMentionListener(api.me())
 
     stream = tweepy.Stream(auth, listener)
     stream.userstream(async=True)
