@@ -32,6 +32,7 @@ class Gram(Base):
     __tablename__ = 'grams'
     id = Column(Integer, primary_key=True)
     gram = Column(String, unique=True, nullable=False)
+    idf = Column(Integer)
 
     def __init__(self, gram):
         self.gram = gram
@@ -56,6 +57,9 @@ def add_document(session, question, answer):
     doc = Document(question, answer)
     doc.grams = list(grams)
 
+    for gram in session.query(Gram).all():
+        gram.idf = get_idf(session, gram)
+
     session.commit()
 
 
@@ -63,10 +67,7 @@ def get_tf(gram, document):
     if isinstance(gram, Gram):
         gram = gram.gram
 
-    max_count = max([document.text.count(g.gram) for g in document.grams])
-    count = document.text.count(gram)
-
-    return 0.5 + (0.5 * count) / max_count
+    return document.text.count(gram)
 
 
 def get_idf(session, gram):
@@ -99,13 +100,13 @@ def get_best_answer(session, query):
         if gram:
             grams.add(gram)
 
-    idfs = dict((gram.gram, get_idf(session, gram)) for gram in grams)
+    idfs = dict((gram.gram, gram.idf) for gram in grams)
 
     documents = session.query(Document).all()
     for doc in documents:
         tf_idfs = {}
         for gram in doc.grams:
-            tf_idfs[gram.gram] = get_tf(gram, doc) * get_idf(session, gram)
+            tf_idfs[gram.gram] = get_tf(gram, doc) * gram.idf
 
         docs[doc.answer] = cosine_measure(idfs, tf_idfs)
 
