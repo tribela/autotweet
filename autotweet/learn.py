@@ -30,7 +30,7 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             original_status = self.api.get_status(status.in_reply_to_status_id)
 
             question = strip_tweet(original_status.text)
-            answer = strip_tweet(status.text)
+            answer = mention_pattern.sub('', status.text)
 
             if question and answer:
                 add_document(self.session, question, answer)
