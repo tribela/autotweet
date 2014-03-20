@@ -52,6 +52,9 @@ def add_document(session, question, answer):
 
 
 def _add_doc(session, question, answer):
+    if session.query(Document, text=question, answer=answer).count():
+        return
+
     grams = set()
     for i in range(len(question) - GRAM_LENGTH + 1):
         gram = question[i:i+GRAM_LENGTH]
