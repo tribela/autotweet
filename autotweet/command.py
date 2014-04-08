@@ -4,13 +4,50 @@ except ImportError:
     import ConfigParser as configparser
 import argparse
 import os
+import waitress
 
 from .database import init_db
 from .learn import authorize, learning_daemon
+from .server import app
+
+
+def collector_command(args, config):
+    db_url = config.get('database', 'db_url')
+    token = config.get('auth', 'token')
+
+    session = init_db(db_url)
+    learning_daemon(token, session)
+
+
+def server_command(args, config):
+    db_url = config.get('database', 'db_url')
+    session = init_db(db_url)
+    app.config.update(session=session)
+    waitress.serve(app, host='0.0.0.0', port=8080)
 
 
 parser = argparse.ArgumentParser(prog='autotweet')
 parser.add_argument('-c', '--config', help='config file')
+
+subparsers = parser.add_subparsers(dest='command')
+
+collector_parser = subparsers.add_parser(
+    'collector',
+    help='tweet collector for database')
+collector_parser.set_defaults(function=collector_command)
+
+server_parser = subparsers.add_parser(
+    'server',
+    help='server for simsim webservice')
+server_parser.set_defaults(function=server_command)
+server_parser.add_argument('-H', '--host',
+                           default='0.0.0.0',
+                           help='Host to listen. [default: %(default)s]')
+server_parser.add_argument('-p', '--port',
+                           type=int,
+                           default=5000,
+                           help='port number to listen. [default: %(default)s]')
+
 
 config = configparser.ConfigParser()
 config.add_section('auth')
@@ -19,6 +56,11 @@ config.add_section('database')
 
 def main():
     args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        exit(1)
+
     config_path = args.config or os.path.join(os.getenv('HOME'), '.autotweetrc')
     config.read(config_path)
 
@@ -37,8 +79,8 @@ def main():
     with open(config_path, 'w') as fp:
         config.write(fp)
 
-    session = init_db(db_url)
-    learning_daemon(token, session)
+    args.function(args, config)
+
 
 if __name__ == '__main__':
     main()
