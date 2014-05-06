@@ -57,12 +57,7 @@ def _add_doc(session, question, answer):
     if session.query(Document).filter_by(text=question, answer=answer).count():
         return
 
-    grams = set()
-    for i in range(len(question) - GRAM_LENGTH + 1):
-        gram = question[i:i+GRAM_LENGTH]
-        gram = session.query(Gram).filter_by(gram=gram).first() or Gram(gram)
-        session.add(gram)
-        grams.add(gram)
+    grams = _make_grams(session, question)
 
     doc = Document(question, answer)
     doc.grams = list(grams)
@@ -75,6 +70,27 @@ def _recalc_idfs(session):
         gram.idf = get_idf(session, gram)
 
     session.commit()
+
+
+def _make_grams(session, text):
+    grams = set()
+    for i in range(len(text) - GRAM_LENGTH + 1):
+        gram = text[i:i+GRAM_LENGTH]
+        gram = session.query(Gram).filter_by(gram=gram).first() or Gram(gram)
+        session.add(gram)
+        grams.add(gram)
+
+    return grams
+
+
+def recreate_grams(session):
+    for document in session.query(Document).all():
+        grams = _make_grams(session, document.text)
+        document.grams = list(grams)
+
+    session.commit()
+
+    _recalc_idfs(session)
 
 
 def get_tf(gram, document):
