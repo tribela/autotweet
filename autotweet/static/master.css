@@ -53,6 +53,16 @@ form input[type=submit] {
     float: left;
 }
 
+#messages > .message.other > .msg > .content {
+    display: block;
+}
+
+#messages > .message.other > .msg > .ratio {
+    font-size: .7em;
+    color: grey;
+    display: block;
+}
+
 .lastline input {
     font-size: 1.5em;
     pading: .3em;

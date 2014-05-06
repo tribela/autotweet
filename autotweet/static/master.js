@@ -31,9 +31,25 @@ $(function() {
             method: target.attr('method'),
             data: payload,
             success: function(data) {
-                if (data == '') {
-                    data = 'I cannot answer. please teach me.';
-                }
+                var p = $('<p>');
+                var span = $('<span>');
+                var answer = $('<span>');
+                var ratio = $('<span>');
+                answer.text(data.answer);
+                answer.addClass('content');
+                ratio.text(data.ratio);
+                ratio.addClass('ratio');
+                span.addClass('msg');
+                span.append(answer);
+                span.append(ratio);
+                p.addClass('message');
+                p.addClass('other');
+                p.append(span);
+                messages.append(p);
+                messages.scrollTop(messages[0].scrollHeight);
+            },
+            error: function() {
+                var data = 'I cannot answer. please teach me.';
                 var p = $('<p>');
                 var span = $('<span>');
                 span.text(data);
@@ -43,7 +59,7 @@ $(function() {
                 p.append(span);
                 messages.append(p);
                 messages.scrollTop(messages[0].scrollHeight);
-            },
+            }
         });
 
         messages.scrollTop(messages[0].scrollHeight);
