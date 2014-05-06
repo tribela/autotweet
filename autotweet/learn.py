@@ -66,11 +66,4 @@ def learning_daemon(token, session):
     listener = MyMentionListener(api, session)
 
     stream = tweepy.Stream(auth, listener)
-    stream.userstream(async=True)
-
-    try:
-        while 1:
-            time.sleep(10)
-    except KeyboardInterrupt:
-        print('Quit...')
-        stream.disconnect()
+    stream.userstream()
