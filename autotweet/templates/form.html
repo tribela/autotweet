@@ -12,7 +12,7 @@
         <div id="main" class="block">
             <div id="messages">
             </div>
-            <form action="{{url_for('result')}}" class="lastline query">
+            <form action="{{url_for('result')}}" method="get" class="lastline query">
                 <input type="submit" value="Send" />
                 <span class="holder">
                     <input type="text" name="query" autocomplete="off" />
