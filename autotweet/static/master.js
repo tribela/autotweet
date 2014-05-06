@@ -27,19 +27,23 @@ $(function() {
 
         input.val(null);
 
-        $.post(target.attr('action'), payload, function(data) {
-            if (data == '') {
-                data = 'I cannot answer. please teach me.';
-            }
-            var p = $('<p>');
-            var span = $('<span>');
-            span.text(data);
-            span.addClass('msg');
-            p.addClass('message');
-            p.addClass('other');
-            p.append(span);
-            messages.append(p);
-            messages.scrollTop(messages[0].scrollHeight);
+        $.ajax(target.attr('action'), {
+            method: target.attr('method'),
+            data: payload,
+            success: function(data) {
+                if (data == '') {
+                    data = 'I cannot answer. please teach me.';
+                }
+                var p = $('<p>');
+                var span = $('<span>');
+                span.text(data);
+                span.addClass('msg');
+                p.addClass('message');
+                p.addClass('other');
+                p.append(span);
+                messages.append(p);
+                messages.scrollTop(messages[0].scrollHeight);
+            },
         });
 
         messages.scrollTop(messages[0].scrollHeight);
@@ -48,8 +52,12 @@ $(function() {
     function teach(target) {
         var payload = target.serialize();
 
-        $.post(target.attr('action'), payload, function() {
-            target[0].reset();
+        $.ajax(target.attr('action'), {
+            method: target.attr('method'),
+            data: payload,
+            success: function() {
+                target[0].reset();
+            },
         });
     }
 
