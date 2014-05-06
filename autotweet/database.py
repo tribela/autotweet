@@ -52,6 +52,8 @@ def add_document(session, question, answer):
 
 
 def _add_doc(session, question, answer):
+    question = question.strip()
+    answer = answer.strip()
     if session.query(Document).filter_by(text=question, answer=answer).count():
         return
 
