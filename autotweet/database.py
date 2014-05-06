@@ -127,6 +127,7 @@ def get_best_answer(session, query):
     docs = dict((key, val) for (key, val) in docs.items() if val)
 
     try:
-        return max(docs, key=docs.get)
+        key = max(docs, key=docs.get)
+        return (key, docs[key])
     except ValueError:
         return None

@@ -1,5 +1,5 @@
 import threading
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 try:
     from queue import Queue
 except ImportError:
@@ -44,7 +44,15 @@ def result():
     session = app.config['session']
     query = request.args['query']
     answer = get_best_answer(session, query)
-    return answer or ''
+    if not answer:
+        r = jsonify()
+        r.status_code = 404
+        return r
+
+    return jsonify({
+        'answer': answer[0],
+        'ratio': answer[1],
+        })
 
 
 @app.route('/teach/', methods=['POST'])
