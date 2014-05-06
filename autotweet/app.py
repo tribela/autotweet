@@ -12,10 +12,10 @@ def form():
     return render_template('form.html', count=count)
 
 
-@app.route('/query/', methods=['POST'])
+@app.route('/query/')
 def result():
     session = app.config['session']
-    query = request.form['query']
+    query = request.args['query']
     answer = get_best_answer(session, query)
     return answer or ''
 
