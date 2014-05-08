@@ -8,7 +8,7 @@ import waitress
 
 from .database import init_db
 from .learn import authorize, learning_daemon
-from .server import app
+from .app import app, spawn_worker
 
 
 def collector_command(args, config):
@@ -23,6 +23,7 @@ def server_command(args, config):
     db_url = config.get('database', 'db_url')
     session = init_db(db_url)
     app.config.update(session=session)
+    app.spawn_worker()
     waitress.serve(app, host='0.0.0.0', port=8080)
 
 
