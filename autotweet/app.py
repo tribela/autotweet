@@ -29,9 +29,6 @@ def spawn_worker():
     thread.start()
 
 
-spawn_worker()
-
-
 @app.route('/')
 def form():
     session = app.config['session']
