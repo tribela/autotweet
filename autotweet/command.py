@@ -8,7 +8,7 @@ import waitress
 
 from .database import init_db
 from .learn import authorize, learning_daemon
-from .server import app
+from .app import app
 
 
 def collector_command(args, config):
