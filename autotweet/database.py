@@ -131,6 +131,8 @@ def cosine_measure(v1, v2):
 def get_best_answer(session, query):
     grams = set()
     docs = {}
+    if not isinstance(query, unicode):
+        query = query.decode('utf-8')
     for i in range(len(query) - GRAM_LENGTH + 1):
         gram = query[i:i+GRAM_LENGTH]
         gram = session.query(Gram).filter_by(gram=gram).first()
