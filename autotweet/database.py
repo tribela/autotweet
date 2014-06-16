@@ -145,3 +145,6 @@ class AutoAnswer():
             return (key, docs[key])
         except ValueError:
             return None
+
+    def __len__(self):
+        return self.session.query(Document).count()

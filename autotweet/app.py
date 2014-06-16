@@ -5,22 +5,20 @@ try:
 except ImportError:
     from Queue import Queue
 
-from .database import _add_doc, _recalc_idfs, Document, get_best_answer
-
 app = Flask(__name__)
 
 pipe = Queue()
 
 
 def worker():
-    session = app.config['session']
+    atm = app.config['atm']
     while 1:
         (question, answer) = pipe.get()
-        _add_doc(session, question, answer)
+        atm._add_doc(question, answer)
         pipe.task_done()
 
         if not pipe.qsize():
-            _recalc_idfs(session)
+            atm._recalc_idfs()
 
 
 def spawn_worker():
@@ -31,16 +29,16 @@ def spawn_worker():
 
 @app.route('/')
 def form():
-    session = app.config['session']
-    count = session.query(Document).count()
+    atm = app.config['atm']
+    count = len(atm)
     return render_template('form.html', count=count)
 
 
 @app.route('/query/')
 def result():
-    session = app.config['session']
+    atm = app.config['atm']
     query = request.args['query']
-    answer = get_best_answer(session, query)
+    answer = atm.get_best_answer(query)
     if not answer:
         r = jsonify()
         r.status_code = 404

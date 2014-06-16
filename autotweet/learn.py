@@ -3,7 +3,6 @@ import re
 import time
 import tweepy
 
-from .database import add_document
 
 CONSUMER_KEY = '62yWrV2RhpGgWOKlqvJPNQ'
 CONSUMER_SECRET = 'Je6NLI7AN3c1BJP9kHaq1p8GBkMyKs5GhX954dWJ6I'
@@ -16,10 +15,10 @@ mention_pattern = re.compile(r'@\w+')
 
 class MyMentionListener(tweepy.streaming.StreamListener):
 
-    def __init__(self, api, session):
+    def __init__(self, api, atm):
         super(MyMentionListener, self).__init__()
         self.api = api
-        self.session = session
+        self.atm = atm
         self.me = api.me()
 
     def on_status(self, status):
@@ -33,7 +32,7 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             answer = mention_pattern.sub('', status.text)
 
             if question and answer:
-                add_document(self.session, question, answer)
+                atm.add_document(question, answer)
 
         return True
 
@@ -56,14 +55,14 @@ def strip_tweet(text):
     return text
 
 
-def learning_daemon(token, session):
+def learning_daemon(token, atm):
     if not isinstance(token, tweepy.oauth.OAuthToken):
         token = tweepy.oauth.OAuthToken.from_string(token)
 
     auth.set_access_token(token.key, token.secret)
     api = tweepy.API(auth)
 
-    listener = MyMentionListener(api, session)
+    listener = MyMentionListener(api, atm)
 
     stream = tweepy.Stream(auth, listener)
     stream.userstream()
