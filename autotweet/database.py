@@ -50,6 +50,40 @@ class AutoAnswer():
         self._add_doc(question, answer)
         self._recalc_idfs()
 
+    def get_best_answer(self, query):
+        grams = set()
+        docs = {}
+        if not isinstance(query, unicode):
+            query = query.decode('utf-8')
+        for i in range(len(query) - GRAM_LENGTH + 1):
+            gram = query[i:i+GRAM_LENGTH]
+            gram = self.session.query(Gram).filter_by(gram=gram).first()
+            if gram:
+                grams.add(gram)
+
+        idfs = dict((gram.gram, gram.idf) for gram in grams)
+
+        documents = self.session.query(Document).all()
+        docs = dict(
+            (doc.answer, self._cosine_measure(idfs, self._get_tf_idfs(doc)))
+            for doc in documents)
+        docs = dict((key, val) for (key, val) in docs.items() if val)
+
+        try:
+            key = max(docs, key=docs.get)
+            return (key, docs[key])
+        except ValueError:
+            return None
+
+    def recreate_grams(self):
+        for document in self.session.query(Document).all():
+            grams = self._make_grams(document.text)
+            document.grams = list(grams)
+
+        self.session.commit()
+
+        self._recalc_idfs()
+
     def _add_doc(self, question, answer):
         question = question.strip()
         answer = answer.strip()
@@ -66,7 +100,7 @@ class AutoAnswer():
 
     def _recalc_idfs(self):
         for gram in self.session.query(Gram).all():
-            gram.idf = self.get_idf(gram)
+            gram.idf = self._get_idf(gram)
 
         self.session.commit()
 
@@ -81,33 +115,24 @@ class AutoAnswer():
 
         return grams
 
-    def recreate_grams(self):
-        for document in self.session.query(Document).all():
-            grams = self._make_grams(document.text)
-            document.grams = list(grams)
-
-        self.session.commit()
-
-        self._recalc_idfs()
-
-    def get_tf(self, gram, document):
+    def _get_tf(self, gram, document):
         if isinstance(gram, Gram):
             gram = gram.gram
 
         return document.text.count(gram)
 
-    def get_idf(self, gram):
+    def _get_idf(self, gram):
         all_count = self.session.query(Document).count()
         d_count = len(gram.documents)
         return math.log((all_count / (1.0 + d_count)) + 1)
 
-    def get_tf_idfs(self, document):
+    def _get_tf_idfs(self, document):
         tf_idfs = {}
         for gram in document.grams:
-            tf_idfs[gram.gram] = self.get_tf(gram, document) * gram.idf
+            tf_idfs[gram.gram] = self._get_tf(gram, document) * gram.idf
         return tf_idfs
 
-    def cosine_measure(self, v1, v2):
+    def _cosine_measure(self, v1, v2):
         intersection = set(v1.keys()) & set(v2.keys())
         numerator = sum([v1[x] * v2[x] for x in intersection])
 
@@ -120,31 +145,6 @@ class AutoAnswer():
             return numerator / denominator
         except ZeroDivisionError:
             return 0
-
-    def get_best_answer(self, query):
-        grams = set()
-        docs = {}
-        if not isinstance(query, unicode):
-            query = query.decode('utf-8')
-        for i in range(len(query) - GRAM_LENGTH + 1):
-            gram = query[i:i+GRAM_LENGTH]
-            gram = self.session.query(Gram).filter_by(gram=gram).first()
-            if gram:
-                grams.add(gram)
-
-        idfs = dict((gram.gram, gram.idf) for gram in grams)
-
-        documents = self.session.query(Document).all()
-        docs = dict(
-            (doc.answer, self.cosine_measure(idfs, self.get_tf_idfs(doc)))
-            for doc in documents)
-        docs = dict((key, val) for (key, val) in docs.items() if val)
-
-        try:
-            key = max(docs, key=docs.get)
-            return (key, docs[key])
-        except ValueError:
-            return None
 
     def __len__(self):
         return self.session.query(Document).count()
