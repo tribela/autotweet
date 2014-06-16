@@ -23,7 +23,7 @@ def server_command(args, config):
     db_url = config.get('database', 'db_url')
     session = init_db(db_url)
     app.config.update(session=session)
-    app.spawn_worker()
+    spawn_worker()
     waitress.serve(app, host='0.0.0.0', port=8080)
 
 
