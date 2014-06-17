@@ -1,4 +1,6 @@
 import re
+import tweepy
+import webbrowser
 
 
 CONSUMER_KEY = '62yWrV2RhpGgWOKlqvJPNQ'
@@ -9,6 +11,7 @@ mention_pattern = re.compile(r'@\w+')
 
 
 def authorize():
+    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     url = auth.get_authorization_url()
     print('Open this url on your webbrowser: {0}'.format(url))
     webbrowser.open(url)

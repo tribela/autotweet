@@ -1,4 +1,3 @@
-import webbrowser
 import time
 import tweepy
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
