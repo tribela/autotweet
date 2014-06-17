@@ -9,8 +9,15 @@ app = Flask(__name__)
 
 pipe = Queue()
 
+app.config.update({
+    'use_worker': True,
+    'worker_running': False,
+    })
+
 
 def worker():
+    print('worker started')
+    app.config.update(worker_running=True)
     atm = app.config['atm']
     while 1:
         (question, answer) = pipe.get()
@@ -25,6 +32,12 @@ def spawn_worker():
     thread = threading.Thread(target=worker)
     thread.setDaemon(True)
     thread.start()
+
+
+@app.before_first_request
+def initialize():
+    if app.config['use_worker']:
+        spawn_worker()
 
 
 @app.route('/')
@@ -56,7 +69,11 @@ def teach():
     answer = request.form['answer'].strip()
 
     if question and answer:
-        pipe.put((question, answer))
-        return ('', 202)
+        if app.config['worker_running']:
+            pipe.put((question, answer))
+            return ('', 202)
+        else:
+            app.config['atm'].add_document(question, answer)
+            return ''
 
     return ('', 400)
