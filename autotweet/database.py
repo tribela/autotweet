@@ -128,9 +128,9 @@ class AutoAnswer():
 
     def _get_tf_idfs(self, document):
         tf_idfs = dict(
-                (gram.gram, self._get_tf(gram, document) * gram.idf)
-                for gram in document.grams
-                if gram.idf is not None)
+            (gram.gram, self._get_tf(gram, document) * gram.idf)
+            for gram in document.grams
+            if gram.idf is not None)
         return tf_idfs
 
     def _cosine_measure(self, v1, v2):
