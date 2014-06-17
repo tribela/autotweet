@@ -15,8 +15,8 @@ def collector_command(args, config):
     db_url = config.get('database', 'db_url')
     token = config.get('auth', 'token')
 
-    session = init_db(db_url)
-    learning_daemon(token, session)
+    atm = AutoAnswer(db_url)
+    learning_daemon(token, atm)
 
 
 def server_command(args, config):
