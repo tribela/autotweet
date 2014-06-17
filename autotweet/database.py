@@ -127,9 +127,10 @@ class AutoAnswer():
         return math.log((all_count / (1.0 + d_count)) + 1)
 
     def _get_tf_idfs(self, document):
-        tf_idfs = {}
-        for gram in document.grams:
-            tf_idfs[gram.gram] = self._get_tf(gram, document) * gram.idf
+        tf_idfs = dict(
+                (gram.gram, self._get_tf(gram, document) * gram.idf)
+                for gram in document.grams
+                if gram.idf is not None)
         return tf_idfs
 
     def _cosine_measure(self, v1, v2):
