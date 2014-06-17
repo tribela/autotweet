@@ -22,7 +22,7 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             answer = strip_tweet(status.text, remove_url=False)
 
             if question and answer:
-                atm.add_document(question, answer)
+                self.atm.add_document(question, answer)
 
         return True
 
