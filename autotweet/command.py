@@ -6,9 +6,10 @@ import argparse
 import os
 import waitress
 
+from .answer import answer_daemon
+from .app import app, spawn_worker
 from .database import AutoAnswer
 from .learn import learning_daemon
-from .app import app, spawn_worker
 from .twitter import authorize
 
 
@@ -18,6 +19,14 @@ def collector_command(args, config):
 
     atm = AutoAnswer(db_url)
     learning_daemon(token, atm)
+
+
+def answer_command(args, config):
+    db_url = config.get('database', 'db_url')
+    token = config.get('auth', 'answerer_token')
+
+    atm = AutoAnswer(db_url)
+    answer_daemon(token, atm)
 
 
 def server_command(args, config):
@@ -37,6 +46,11 @@ collector_parser = subparsers.add_parser(
     'collector',
     help='tweet collector for database')
 collector_parser.set_defaults(function=collector_command)
+
+answer_parser = subparsers.add_parser(
+    'answer',
+    help='Auto answer to mentions.')
+answer_parser.set_defaults(function=answer_command)
 
 server_parser = subparsers.add_parser(
     'server',
@@ -77,6 +91,12 @@ def main():
     except configparser.NoOptionError:
         token = authorize().to_string()
         config.set('auth', 'token', token)
+
+    try:
+        answerer_token = config.get('auth', 'answerer_token')
+    except configparser.NoOptionError:
+        answerer_token = authorize().to_string()
+        config.set('auth', 'answerer_token', answerer_token)
 
     with open(config_path, 'w') as fp:
         config.write(fp)
