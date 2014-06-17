@@ -76,7 +76,7 @@ def main():
         token = config.get('auth', 'token')
     except configparser.NoOptionError:
         token = authorize().to_string()
-        config.set('auth', 'token', token.to_string())
+        config.set('auth', 'token', token)
 
     with open(config_path, 'w') as fp:
         config.write(fp)
