@@ -137,8 +137,8 @@ class AutoAnswer():
         intersection = set(v1.keys()) & set(v2.keys())
         numerator = sum([v1[x] * v2[x] for x in intersection])
 
-        sum1 = sum([v1[x]**2 for x in v1.keys()])
-        sum2 = sum([v2[y]**2 for y in v2.keys()])
+        sum1 = sum([v1[x]**2 for x in v1.keys() if v1[x] is not None])
+        sum2 = sum([v2[y]**2 for y in v2.keys() if v2[y] is not None])
 
         denominator = math.sqrt(sum1) * math.sqrt(sum2)
 
