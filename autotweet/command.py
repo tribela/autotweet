@@ -7,8 +7,9 @@ import os
 import waitress
 
 from .database import AutoAnswer
-from .learn import authorize, learning_daemon
+from .learn import learning_daemon
 from .app import app, spawn_worker
+from .twitter import authorize
 
 
 def collector_command(args, config):
