@@ -3,6 +3,7 @@ from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
 
 
 class MentionListener(tweepy.streaming.StreamListener):
+    _threshold = 0.3
 
     def __init__(self, api, atm):
         super(MentionListener, self).__init__()
@@ -14,13 +15,14 @@ class MentionListener(tweepy.streaming.StreamListener):
         if hasattr(status, 'retweeted_status'):
             return True
 
-        if status.in_reply_to_user_id == self.me.id:
-            question = strip_tweet(status.text)
-            user_name = status.user.screen_name
-            status_id = status.id
+        question = strip_tweet(status.text)
+        user_name = status.user.screen_name
+        status_id = status.id
 
-            (answer, ratio) = self.atm.get_best_answer(question)
+        (answer, ratio) = self.atm.get_best_answer(question)
 
+        if (status.in_reply_to_user_id == self.me.id) or\
+                (status.user.id != self.me.id and ratio >= self._threshold):
             self.api.update_status(
                 u'@{0} {1}'.format(user_name, answer),
                 status_id)
