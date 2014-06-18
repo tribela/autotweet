@@ -84,6 +84,13 @@ class AutoAnswer():
 
         self._recalc_idfs()
 
+        grams = self.session.query(Gram).all()
+        broken_links = [gram for gram in grams if len(gram.documents) == 0]
+        for gram in broken_links:
+            self.session.delete(gram)
+
+        self.session.commit()
+
     def _add_doc(self, question, answer):
         question = question.strip()
         answer = answer.strip()
