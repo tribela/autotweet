@@ -1,5 +1,8 @@
+import re
 import tweepy
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
+
+MENTION_PATTERN = re.compile(r'(?:\B@)\w+')
 
 
 class MentionListener(tweepy.streaming.StreamListener):
@@ -15,8 +18,14 @@ class MentionListener(tweepy.streaming.StreamListener):
         if hasattr(status, 'retweeted_status'):
             return True
 
-        question = strip_tweet(status.text)
         user_name = status.user.screen_name
+        mentions = set(MENTION_PATTERN.findall(status.text))
+        mentions.remove(user_name)
+        mentions = [user_name] + list(mentions)
+        mentions = map(lambda x: '@' + x, mentions)
+
+
+        question = strip_tweet(status.text)
         status_id = status.id
 
         (answer, ratio) = self.atm.get_best_answer(question)
@@ -24,7 +33,7 @@ class MentionListener(tweepy.streaming.StreamListener):
         if (status.in_reply_to_user_id == self.me.id) or\
                 (status.user.id != self.me.id and ratio >= self._threshold):
             self.api.update_status(
-                u'@{0} {1}'.format(user_name, answer),
+                u'{0} {1}'.format(' '.join(mentions), answer),
                 status_id)
 
 
