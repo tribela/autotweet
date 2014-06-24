@@ -23,7 +23,7 @@ class MentionListener(tweepy.streaming.StreamListener):
 
         user_name = status.user.screen_name
         mentions = set(MENTION_PATTERN.findall(status.text))
-        mentions.remove(user_name)
+        mentions.discard(user_name)
         mentions = [user_name] + list(mentions)
         mentions = map(lambda x: '@' + x, mentions)
 
