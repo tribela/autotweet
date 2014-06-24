@@ -6,13 +6,16 @@ MENTION_PATTERN = re.compile(r'(?:\B@)\w+')
 
 
 class MentionListener(tweepy.streaming.StreamListener):
-    _threshold = 0.3
+    threshold = 0.3
 
-    def __init__(self, api, atm):
+    def __init__(self, api, atm, threshold=None):
         super(MentionListener, self).__init__()
         self.api = api
         self.atm = atm
         self.me = api.me()
+
+        if threshold:
+            self.threshold = threshold
 
     def on_status(self, status):
         if hasattr(status, 'retweeted_status'):
@@ -31,13 +34,13 @@ class MentionListener(tweepy.streaming.StreamListener):
         (answer, ratio) = self.atm.get_best_answer(question)
 
         if (status.in_reply_to_user_id == self.me.id) or\
-                (status.user.id != self.me.id and ratio >= self._threshold):
+                (status.user.id != self.me.id and ratio >= self.threshold):
             self.api.update_status(
                 u'{0} {1}'.format(' '.join(mentions), answer),
                 status_id)
 
 
-def answer_daemon(token, atm):
+def answer_daemon(token, atm, threshold=None):
     if not isinstance(token, tweepy.oauth.OAuthToken):
         token = tweepy.oauth.OAuthToken.from_string(token)
 
@@ -45,7 +48,7 @@ def answer_daemon(token, atm):
     auth.set_access_token(token.key, token.secret)
     api = tweepy.API(auth)
 
-    listener = MentionListener(api, atm)
+    listener = MentionListener(api, atm, threshold=threshold)
 
     stream = tweepy.Stream(auth, listener)
     stream.userstream()

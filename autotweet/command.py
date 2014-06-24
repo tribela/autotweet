@@ -24,9 +24,13 @@ def collector_command(args, config):
 def answer_command(args, config):
     db_url = config.get('database', 'db_url')
     token = config.get('auth', 'answerer_token')
+    try:
+        threshold = config.getfloat('answer', 'threshold')
+    except:
+        threshold = None
 
     atm = AutoAnswer(db_url)
-    answer_daemon(token, atm)
+    answer_daemon(token, atm, threshold=threshold)
 
 
 def server_command(args, config):
