@@ -42,3 +42,21 @@ You can test answer or chatting on web by server command
 .. code-block:: console
 
    $ autotweet server
+
+
+Configure
+---------
+
+You can configure Autotweet by editing ``~/.autotweetrc`` file.
+
+.. code-block:: cfg
+
+   [auth]
+   token = <OAuth token (automaticaly generated)>
+   answerer_token = <OAuth token (automaticaly generated)>
+   
+   [database]
+   db_url = <database url>
+
+   [answer]
+   threshold = <Auto answering to tweet that is not mention to answerer. (float 0.0 ~ 1.0)>
