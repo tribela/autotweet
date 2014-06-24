@@ -27,7 +27,7 @@ Autotweet can learn your tweet by collector.
 Automatic answering by clone account
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Your clone account can automatic answer by answer command
+Your clone account can automatic answer by answer command.
 
 .. code-block:: console
 
@@ -37,7 +37,7 @@ Your clone account can automatic answer by answer command
 Web chatting
 ~~~~~~~~~~~~
 
-You can test answer or chatting on web by server command
+You can test answer or chatting on web by server command.
 
 .. code-block:: console
 
