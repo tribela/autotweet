@@ -27,7 +27,6 @@ class MentionListener(tweepy.streaming.StreamListener):
         mentions = [user_name] + list(mentions)
         mentions = map(lambda x: '@' + x, mentions)
 
-
         question = strip_tweet(status.text)
         status_id = status.id
 
