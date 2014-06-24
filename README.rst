@@ -44,6 +44,16 @@ You can test answer or chatting on web by server command
    $ autotweet server
 
 
+Add manually
+~~~~~~~~~~~~
+
+You can add question/answer set manually.
+
+.. code-block:: console
+
+   $ autotweet add 'Question' 'Answer'
+
+
 Configure
 ---------
 

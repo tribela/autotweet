@@ -41,6 +41,15 @@ def server_command(args, config):
     waitress.serve(app, host='0.0.0.0', port=8080)
 
 
+def add_command(args, config):
+    db_url = config.get('database', 'db_url')
+    atm = AutoAnswer(db_url)
+    question = args.question
+    answer = args.answer
+
+    atm.add_document(question, answer)
+
+
 parser = argparse.ArgumentParser(prog='autotweet')
 parser.add_argument('-c', '--config', help='config file')
 
@@ -67,6 +76,13 @@ server_parser.add_argument('-p', '--port',
                            type=int,
                            default=5000,
                            help='port number to listen. [default: %(default)s]')
+
+add_parser = subparsers.add_parser(
+    'add',
+    help='manually add question and answer')
+add_parser.set_defaults(function=add_command)
+add_parser.add_argument('question', help='Question to add')
+add_parser.add_argument('answer', help='Answer to add')
 
 
 config = configparser.ConfigParser()
