@@ -2,7 +2,7 @@ import re
 import tweepy
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
 
-MENTION_PATTERN = re.compile(r'(?:\B@)\w+')
+MENTION_PATTERN = re.compile(r'(?<=\B@)\w+')
 
 
 class MentionListener(tweepy.streaming.StreamListener):
@@ -24,6 +24,7 @@ class MentionListener(tweepy.streaming.StreamListener):
         user_name = status.user.screen_name
         mentions = set(MENTION_PATTERN.findall(status.text))
         mentions.discard(user_name)
+        mentions.discard(self.me.screen_name)
         mentions = [user_name] + list(mentions)
         mentions = map(lambda x: '@' + x, mentions)
 
