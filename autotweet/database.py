@@ -1,3 +1,4 @@
+import logging
 import math
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, create_engine
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
@@ -47,6 +48,7 @@ class AutoAnswer():
         self.session = db_session
 
     def add_document(self, question, answer):
+        logging.info(u'add document: {0} -> {1}'.format(question, answer))
         self._add_doc(question, answer)
         self._recalc_idfs()
 
@@ -70,8 +72,10 @@ class AutoAnswer():
         docs = dict((key, val) for (key, val) in docs.items() if val)
 
         try:
-            key = max(docs, key=docs.get)
-            return (key, docs[key])
+            answer = max(docs, key=docs.get)
+            ratio = docs[answer]
+            logging.debug(u'{0} -> {1}'.format(query, answer))
+            return (answer, ratio)
         except ValueError:
             return None
 

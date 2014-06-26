@@ -3,6 +3,7 @@ try:
 except ImportError:
     import ConfigParser as configparser
 import argparse
+import logging
 import os
 import waitress
 
@@ -51,6 +52,8 @@ def add_command(args, config):
 
 parser = argparse.ArgumentParser(prog='autotweet')
 parser.add_argument('-c', '--config', help='config file')
+parser.add_argument('-v', '--verbose', default=0, action='count',
+                    help='Verbose output.')
 
 subparsers = parser.add_subparsers(dest='command')
 
@@ -89,6 +92,18 @@ config.add_section('auth')
 config.add_section('database')
 
 
+def set_logging_level(level):
+    if not level:
+        log_level = logging.NOTSET
+    elif level == 1:
+        log_level = logging.INFO
+    else:
+        log_level = logging.DEBUG
+    logging.basicConfig(
+        format='%(levelname)s: %(message)s',
+        level=log_level)
+
+
 def main():
     args = parser.parse_args()
 
@@ -98,6 +113,8 @@ def main():
 
     config_path = args.config or os.path.join(os.getenv('HOME'), '.autotweetrc')
     config.read(config_path)
+
+    set_logging_level(args.verbose)
 
     try:
         db_url = config.get('database', 'db_url')

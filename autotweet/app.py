@@ -1,3 +1,4 @@
+import logging
 import threading
 from flask import Flask, jsonify, render_template, request
 try:
@@ -16,7 +17,7 @@ app.config.update({
 
 
 def worker():
-    print('worker started')
+    logging.info('worker started')
     app.config.update(worker_running=True)
     atm = app.config['atm']
     while 1:
@@ -38,6 +39,12 @@ def spawn_worker():
 def initialize():
     if app.config['use_worker']:
         spawn_worker()
+
+
+def set_logging_level(level):
+    if level is None:
+        level = 0
+    logging.basicConfig(level=level*10)
 
 
 @app.route('/')

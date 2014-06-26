@@ -1,3 +1,4 @@
+import logging
 import re
 import tweepy
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
@@ -35,6 +36,9 @@ class MentionListener(tweepy.streaming.StreamListener):
 
         if (status.in_reply_to_user_id == self.me.id) or\
                 (status.user.id != self.me.id and ratio >= self.threshold):
+            logging.info(u'@{0.user.screen_name}: {0.text} -> {1}'.format(
+                status, answer
+                ))
             self.api.update_status(
                 u'{0} {1}'.format(' '.join(mentions), answer),
                 status_id)
