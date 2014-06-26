@@ -74,7 +74,7 @@ class AutoAnswer():
         try:
             answer = max(docs, key=docs.get)
             ratio = docs[answer]
-            logging.debug(u'{0} -> {1}'.format(query, answer))
+            logging.debug(u'{0} -> {1} ({2})'.format(query, answer, ratio))
             return (answer, ratio)
         except ValueError:
             return None
