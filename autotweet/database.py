@@ -48,6 +48,10 @@ class AutoAnswer():
         self.session = db_session
 
     def add_document(self, question, answer):
+        if self.session.query(Document)\
+                .filter_by(text=question, answer=answer).count():
+            logging.info(u'Already here: {0} -> {1}'.format(question, answer))
+            return
         logging.info(u'add document: {0} -> {1}'.format(question, answer))
         self._add_doc(question, answer)
         self._recalc_idfs()
