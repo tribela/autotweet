@@ -1,5 +1,6 @@
 import logging
 import math
+import random
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, create_engine
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -76,10 +77,13 @@ class AutoAnswer():
         docs = dict((key, val) for (key, val) in docs.items() if val)
 
         try:
-            answer = max(docs, key=docs.get)
-            ratio = docs[answer]
-            logging.debug(u'{0} -> {1} ({2})'.format(query, answer, ratio))
-            return (answer, ratio)
+            max_ratio = max(docs.values())
+            answers = [answer for answer in docs.keys()
+                       if docs.get(answer) == max_ratio]
+
+            answer = random.choice(answers)
+            logging.debug(u'{0} -> {1} ({2})'.format(query, answer, max_ratio))
+            return (answer, max_ratio)
         except ValueError:
             return None
 
