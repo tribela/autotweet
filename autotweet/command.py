@@ -15,6 +15,12 @@ from .twitter import authorize
 
 
 def collector_command(args, config):
+    try:
+        token = config.get('auth', 'token')
+    except configparser.NoOptionError:
+        token = authorize().to_string()
+        config.set('auth', 'token', token)
+
     db_url = config.get('database', 'db_url')
     token = config.get('auth', 'token')
 
@@ -23,6 +29,12 @@ def collector_command(args, config):
 
 
 def answer_command(args, config):
+    try:
+        answerer_token = config.get('auth', 'answerer_token')
+    except configparser.NoOptionError:
+        answerer_token = authorize().to_string()
+        config.set('auth', 'answerer_token', answerer_token)
+
     db_url = config.get('database', 'db_url')
     token = config.get('auth', 'answerer_token')
     try:
@@ -121,19 +133,6 @@ def main():
     except configparser.NoOptionError:
         db_url = raw_input('db url: ').strip()
         config.set('database', 'db_url', db_url)
-
-    try:
-        token = config.get('auth', 'token')
-    except configparser.NoOptionError:
-        token = authorize().to_string()
-        config.set('auth', 'token', token)
-
-    try:
-        answerer_token = config.get('auth', 'answerer_token')
-    except configparser.NoOptionError:
-        answerer_token = authorize().to_string()
-        config.set('auth', 'answerer_token', answerer_token)
-
     with open(config_path, 'w') as fp:
         config.write(fp)
 
