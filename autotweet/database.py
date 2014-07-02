@@ -138,7 +138,7 @@ class AutoAnswer():
         if isinstance(gram, Gram):
             gram = gram.gram
 
-        return document.text.count(gram)
+        return document.text.count(gram) + document.answer.count(gram)
 
     def _get_idf(self, gram):
         all_count = self.session.query(Document).count()
