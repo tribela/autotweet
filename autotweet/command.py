@@ -56,8 +56,8 @@ def server_command(args, config):
 def add_command(args, config):
     db_url = config.get('database', 'db_url')
     atm = AutoAnswer(db_url)
-    question = args.question
-    answer = args.answer
+    question = args.question.decode('utf-8')
+    answer = args.answer.decode('utf-8')
 
     atm.add_document(question, answer)
 
