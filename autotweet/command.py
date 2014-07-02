@@ -50,7 +50,7 @@ def server_command(args, config):
     db_url = config.get('database', 'db_url')
     atm = AutoAnswer(db_url)
     app.config.update(atm=atm)
-    waitress.serve(app, host='0.0.0.0', port=8080)
+    waitress.serve(app, host=args.host, port=args.port)
 
 
 def add_command(args, config):
