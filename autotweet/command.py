@@ -8,7 +8,7 @@ import os
 import waitress
 
 from .answer import answer_daemon
-from .app import app, spawn_worker
+from .app import app
 from .database import AutoAnswer
 from .learn import learning_daemon
 from .twitter import authorize
