@@ -58,15 +58,11 @@ class AutoAnswer():
         self._recalc_idfs()
 
     def get_best_answer(self, query):
-        grams = set()
-        docs = {}
         if not isinstance(query, unicode):
             query = query.decode('utf-8')
-        for i in range(len(query) - GRAM_LENGTH + 1):
-            gram = query[i:i+GRAM_LENGTH]
-            gram = self.session.query(Gram).filter_by(gram=gram).first()
-            if gram:
-                grams.add(gram)
+
+        docs = {}
+        grams = self._get_grams(query)
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
@@ -89,7 +85,7 @@ class AutoAnswer():
 
     def recreate_grams(self):
         for document in self.session.query(Document).all():
-            grams = self._make_grams(document.text)
+            grams = self._get_grams(document.text, make=True)
             document.grams = list(grams)
 
         self.session.commit()
@@ -110,7 +106,7 @@ class AutoAnswer():
                 .filter_by(text=question, answer=answer).count():
             return
 
-        grams = self._make_grams(question)
+        grams = self._get_grams(question, make=True)
 
         doc = Document(question, answer)
         doc.grams = list(grams)
@@ -123,14 +119,17 @@ class AutoAnswer():
 
         self.session.commit()
 
-    def _make_grams(self, text):
+    def _get_grams(self, text, make=False):
         grams = set()
         for i in range(len(text) - GRAM_LENGTH + 1):
             gram = text[i:i+GRAM_LENGTH]
-            gram = self.session.query(Gram)\
-                .filter_by(gram=gram).first() or Gram(gram)
-            self.session.add(gram)
-            grams.add(gram)
+            gram = self.session.query(Gram).filter_by(gram=gram).first()
+            if gram:
+                grams.add(gram)
+            elif make:
+                gram = Gram(gram)
+                self.session.add(gram)
+                grams.add(gram)
 
         return grams
 
