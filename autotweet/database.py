@@ -90,8 +90,6 @@ class AutoAnswer():
 
         self.session.commit()
 
-        self._recalc_idfs()
-
         broken_links = self.session.query(Gram)\
                 .filter(~Gram.documents.any()).all()
         for gram in broken_links:
