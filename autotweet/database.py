@@ -126,13 +126,13 @@ class AutoAnswer():
         grams = set()
         for i in range(len(text) - GRAM_LENGTH + 1):
             gram = text[i:i+GRAM_LENGTH]
-            gram = self.session.query(Gram).filter_by(gram=gram).first()
-            if gram:
-                grams.add(gram)
+            gram_obj = self.session.query(Gram).filter_by(gram=gram).first()
+            if gram_obj:
+                grams.add(gram_obj)
             elif make:
-                gram = Gram(gram)
-                self.session.add(gram)
-                grams.add(gram)
+                gram_obj = Gram(gram)
+                self.session.add(gram_obj)
+                grams.add(gram_obj)
 
         return grams
 
