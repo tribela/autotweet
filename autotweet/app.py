@@ -20,13 +20,15 @@ def worker():
     logging.info('worker started')
     app.config.update(worker_running=True)
     atm = app.config['atm']
+    changed_grams = set()
     while 1:
         (question, answer) = pipe.get()
-        atm._add_doc(question, answer)
+        grams = atm._add_doc(question, answer)
+        changed_grams.update(grams)
         pipe.task_done()
 
         if not pipe.qsize():
-            atm._recalc_idfs()
+            atm._recalc_idfs(changed_grams)
 
 
 def spawn_worker():

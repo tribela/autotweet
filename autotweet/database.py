@@ -54,19 +54,15 @@ class AutoAnswer():
             logging.info(u'Already here: {0} -> {1}'.format(question, answer))
             return
         logging.info(u'add document: {0} -> {1}'.format(question, answer))
-        self._add_doc(question, answer)
-        self._recalc_idfs()
+        changed_grams = self._add_doc(question, answer)
+        self._recalc_idfs(changed_grams)
 
     def get_best_answer(self, query):
-        grams = set()
-        docs = {}
         if not isinstance(query, unicode):
             query = query.decode('utf-8')
-        for i in range(len(query) - GRAM_LENGTH + 1):
-            gram = query[i:i+GRAM_LENGTH]
-            gram = self.session.query(Gram).filter_by(gram=gram).first()
-            if gram:
-                grams.add(gram)
+
+        docs = {}
+        grams = self._get_grams(query)
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
@@ -89,15 +85,15 @@ class AutoAnswer():
 
     def recreate_grams(self):
         for document in self.session.query(Document).all():
-            grams = self._make_grams(document.text)
+            grams = self._get_grams(document.text, make=True)
             document.grams = list(grams)
 
         self.session.commit()
 
         self._recalc_idfs()
 
-        grams = self.session.query(Gram).all()
-        broken_links = [gram for gram in grams if len(gram.documents) == 0]
+        broken_links = self.session.query(Gram)\
+                .filter(~Gram.documents.any()).all()
         for gram in broken_links:
             self.session.delete(gram)
 
@@ -110,27 +106,33 @@ class AutoAnswer():
                 .filter_by(text=question, answer=answer).count():
             return
 
-        grams = self._make_grams(question)
+        grams = self._get_grams(question, make=True)
 
         doc = Document(question, answer)
         doc.grams = list(grams)
 
         self.session.commit()
+        return grams
 
-    def _recalc_idfs(self):
-        for gram in self.session.query(Gram).all():
+    def _recalc_idfs(self, grams=None):
+        if grams is None:
+            grams = self.session.query(Gram).all()
+        for gram in grams:
             gram.idf = self._get_idf(gram)
 
         self.session.commit()
 
-    def _make_grams(self, text):
+    def _get_grams(self, text, make=False):
         grams = set()
         for i in range(len(text) - GRAM_LENGTH + 1):
             gram = text[i:i+GRAM_LENGTH]
-            gram = self.session.query(Gram)\
-                .filter_by(gram=gram).first() or Gram(gram)
-            self.session.add(gram)
-            grams.add(gram)
+            gram = self.session.query(Gram).filter_by(gram=gram).first()
+            if gram:
+                grams.add(gram)
+            elif make:
+                gram = Gram(gram)
+                self.session.add(gram)
+                grams.add(gram)
 
         return grams
 
