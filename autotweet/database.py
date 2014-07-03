@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
-GRAM_LENGTH = 2
+GRAM_LENGTH = 4
 
 
 association_table = Table(
@@ -124,14 +124,15 @@ class AutoAnswer():
 
     def _get_grams(self, text, make=False):
         grams = set()
-        for gram in self._segmentize(text, GRAM_LENGTH):
-            gram_obj = self.session.query(Gram).filter_by(gram=gram).first()
-            if gram_obj:
-                grams.add(gram_obj)
-            elif make:
-                gram_obj = Gram(gram)
-                self.session.add(gram_obj)
-                grams.add(gram_obj)
+        for length in range(2, GRAM_LENGTH + 1):
+            for gram in self._segmentize(text, length):
+                gram_obj = self.session.query(Gram).filter_by(gram=gram).first()
+                if gram_obj:
+                    grams.add(gram_obj)
+                elif make:
+                    gram_obj = Gram(gram)
+                    self.session.add(gram_obj)
+                    grams.add(gram_obj)
 
         return grams
 
