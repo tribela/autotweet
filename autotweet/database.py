@@ -124,15 +124,16 @@ class AutoAnswer():
 
     def _get_grams(self, text, make=False):
         grams = set()
-        for i in range(len(text) - GRAM_LENGTH + 1):
-            gram = text[i:i+GRAM_LENGTH]
-            gram_obj = self.session.query(Gram).filter_by(gram=gram).first()
-            if gram_obj:
-                grams.add(gram_obj)
-            elif make:
-                gram_obj = Gram(gram)
-                self.session.add(gram_obj)
-                grams.add(gram_obj)
+        for word in text.split():
+            for i in range(len(word) - GRAM_LENGTH + 1):
+                gram = word[i:i+GRAM_LENGTH]
+                gram_obj = self.session.query(Gram).filter_by(gram=gram).first()
+                if gram_obj:
+                    grams.add(gram_obj)
+                elif make:
+                    gram_obj = Gram(gram)
+                    self.session.add(gram_obj)
+                    grams.add(gram_obj)
 
         return grams
 
