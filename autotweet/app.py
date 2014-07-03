@@ -29,6 +29,7 @@ def worker():
 
         if not pipe.qsize():
             atm._recalc_idfs(changed_grams)
+            changed_grams.clear()
 
 
 def spawn_worker():
