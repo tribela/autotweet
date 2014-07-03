@@ -113,8 +113,10 @@ class AutoAnswer():
 
         self.session.commit()
 
-    def _recalc_idfs(self):
-        for gram in self.session.query(Gram).all():
+    def _recalc_idfs(self, grams=None):
+        if grams is None:
+            grams = self.session.query(Gram).all()
+        for gram in grams:
             gram.idf = self._get_idf(gram)
 
         self.session.commit()
