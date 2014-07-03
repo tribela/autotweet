@@ -54,8 +54,8 @@ class AutoAnswer():
             logging.info(u'Already here: {0} -> {1}'.format(question, answer))
             return
         logging.info(u'add document: {0} -> {1}'.format(question, answer))
-        self._add_doc(question, answer)
-        self._recalc_idfs()
+        changed_grams = self._add_doc(question, answer)
+        self._recalc_idfs(changed_grams)
 
     def get_best_answer(self, query):
         if not isinstance(query, unicode):
@@ -112,6 +112,7 @@ class AutoAnswer():
         doc.grams = list(grams)
 
         self.session.commit()
+        return grams
 
     def _recalc_idfs(self, grams=None):
         if grams is None:
