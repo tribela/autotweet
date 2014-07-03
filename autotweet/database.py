@@ -92,8 +92,8 @@ class AutoAnswer():
 
         self._recalc_idfs()
 
-        grams = self.session.query(Gram).all()
-        broken_links = [gram for gram in grams if len(gram.documents) == 0]
+        broken_links = self.session.query(Gram)\
+                .filter(~Gram.documents.any()).all()
         for gram in broken_links:
             self.session.delete(gram)
 
