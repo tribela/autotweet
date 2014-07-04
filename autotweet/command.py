@@ -105,15 +105,14 @@ config.add_section('database')
 
 
 def set_logging_level(level):
+    logging.basicConfig(format='%(levelname)s: %(message)s')
+
     if not level:
-        log_level = logging.NOTSET
+        logging.root.setLevel(logging.WARNING)
     elif level == 1:
-        log_level = logging.INFO
+        logging.root.setLevel(logging.INFO)
     else:
-        log_level = logging.DEBUG
-    logging.basicConfig(
-        format='%(levelname)s: %(message)s',
-        level=log_level)
+        logging.root.setLevel(logging.DEBUG)
 
 
 def main():
