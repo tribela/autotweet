@@ -55,7 +55,6 @@ class AutoAnswer():
             return
         logging.info(u'add document: {0} -> {1}'.format(question, answer))
         self._add_doc(question, answer)
-        self._recalc_idfs()
 
     def get_best_answer(self, query):
         if not isinstance(query, unicode):
@@ -63,6 +62,7 @@ class AutoAnswer():
 
         docs = {}
         grams = self._get_grams(query)
+        self._recalc_idfs(grams)
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
@@ -111,8 +111,10 @@ class AutoAnswer():
 
         self.session.commit()
 
-    def _recalc_idfs(self):
-        for gram in self.session.query(Gram).all():
+    def _recalc_idfs(self, grams=None):
+        if not grams:
+            grams = self.session.query(Gram).all()
+        for gram in grams:
             gram.idf = self._get_idf(gram)
 
         self.session.commit()
