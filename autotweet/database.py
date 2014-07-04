@@ -66,7 +66,7 @@ class AutoAnswer():
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
-        documents = self.session.query(Document).all()
+        documents = set([doc for gram in grams for doc in gram.documents])
         docs = dict(
             (doc.answer, self._cosine_measure(idfs, self._get_tf_idfs(doc)))
             for doc in documents)
