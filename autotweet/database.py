@@ -60,6 +60,9 @@ class AutoAnswer():
         if not isinstance(query, unicode):
             query = query.decode('utf-8')
 
+        if len(query) < GRAM_LENGTH:
+            return
+
         docs = {}
         grams = self._get_grams(query)
         self._recalc_idfs(grams)
