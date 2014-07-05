@@ -14,15 +14,17 @@ def form():
 def result():
     atm = app.config['atm']
     query = request.args['query']
-    answer = atm.get_best_answer(query)
-    if not answer:
+    result = atm.get_best_answer(query)
+    if not result:
         r = jsonify()
         r.status_code = 404
         return r
 
+    answer, ratio = result
+
     return jsonify({
-        'answer': answer[0],
-        'ratio': answer[1],
+        'answer': answer,
+        'ratio': ratio,
         })
 
 
