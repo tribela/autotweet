@@ -112,6 +112,8 @@ class AutoAnswer():
         doc = Document(question, answer)
         doc.grams = list(grams)
 
+        self.session.add(doc)
+
         self.session.commit()
 
     def _recalc_idfs(self, grams=None):
