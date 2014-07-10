@@ -94,7 +94,7 @@ class AutoAnswer():
         self.session.commit()
 
         broken_links = self.session.query(Gram)\
-                .filter(~Gram.documents.any()).all()
+            .filter(~Gram.documents.any()).all()
         for gram in broken_links:
             self.session.delete(gram)
 
