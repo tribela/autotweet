@@ -20,8 +20,8 @@ association_table = Table(
 class Document(Base):
     __tablename__ = 'documents'
     id = Column(Integer, primary_key=True)
-    text = Column(String, nullable=False)
-    answer = Column(String, nullable=False)
+    text = Column(String(140), nullable=False)
+    answer = Column(String(140), nullable=False)
     grams = relationship(
         'Gram', secondary=association_table, backref='documents')
 
@@ -33,7 +33,7 @@ class Document(Base):
 class Gram(Base):
     __tablename__ = 'grams'
     id = Column(Integer, primary_key=True)
-    gram = Column(String, unique=True, nullable=False)
+    gram = Column(String(GRAM_LENGTH), unique=True, nullable=False)
     idf = Column(Integer)
 
     def __init__(self, gram):
