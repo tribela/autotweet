@@ -63,13 +63,14 @@ class AutoAnswer():
         if len(query) < GRAM_LENGTH:
             return
 
-        docs = {}
         grams = self._get_grams(query)
-        self._recalc_idfs(grams)
+        documents = set([doc for gram in grams for doc in gram.documents])
+        all_grams = set([gram for doc in documents for gram in doc.grams])
+
+        self._recalc_idfs(all_grams)
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
-        documents = set([doc for gram in grams for doc in gram.documents])
         docs = dict(
             (doc.answer, self._cosine_measure(idfs, self._get_tf_idfs(doc)))
             for doc in documents)
