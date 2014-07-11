@@ -65,9 +65,8 @@ class AutoAnswer():
 
         grams = self._get_grams(query)
         documents = set([doc for gram in grams for doc in gram.documents])
-        all_grams = set([gram for doc in documents for gram in doc.grams])
 
-        self._recalc_idfs(all_grams)
+        self._recalc_idfs(grams)
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
@@ -112,6 +111,7 @@ class AutoAnswer():
 
         doc = Document(question, answer)
         doc.grams = list(grams)
+        self._recalc_idfs(grams)
 
         self.session.add(doc)
 
