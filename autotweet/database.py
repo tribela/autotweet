@@ -45,7 +45,7 @@ class AutoAnswer():
     def __init__(self, url):
         engine = create_engine(url)
         db_session = scoped_session(
-            sessionmaker(engine, autoflush=False, autocommit=False))
+            sessionmaker(engine, autoflush=True, autocommit=False))
         Base.metadata.create_all(engine)
         self.session = db_session
 
