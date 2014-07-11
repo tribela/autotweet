@@ -2,8 +2,8 @@ import logging
 import math
 import random
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, create_engine
-from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 
 
 Base = declarative_base()
@@ -44,7 +44,8 @@ class AutoAnswer():
 
     def __init__(self, url):
         engine = create_engine(url)
-        db_session = scoped_session(sessionmaker(engine))
+        db_session = scoped_session(
+            sessionmaker(engine, autoflush=False, autocommit=False))
         Base.metadata.create_all(engine)
         self.session = db_session
 
