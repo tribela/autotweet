@@ -138,6 +138,9 @@ class AutoAnswer():
                 self.session.add(gram_obj)
                 grams.add(gram_obj)
 
+        if make:
+            self.session.commit()
+
         return grams
 
     def _get_tf(self, gram, document):
