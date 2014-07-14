@@ -176,4 +176,4 @@ class AutoAnswer():
             return 0
 
     def __len__(self):
-        return self.session.query(Document).count()
+        return int(self.session.query(Document).count())
