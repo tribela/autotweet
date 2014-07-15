@@ -67,7 +67,7 @@ class AutoAnswer():
         grams = self._get_grams(query)
         documents = set([doc for gram in grams for doc in gram.documents])
 
-        self._recalc_idfs(grams)
+        self.recalc_idfs(grams)
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
@@ -112,13 +112,13 @@ class AutoAnswer():
 
         doc = Document(question, answer)
         doc.grams = list(grams)
-        self._recalc_idfs(grams)
+        self.recalc_idfs(grams)
 
         self.session.add(doc)
 
         self.session.commit()
 
-    def _recalc_idfs(self, grams=None):
+    def recalc_idfs(self, grams=None):
         if not grams:
             grams = self.session.query(Gram).all()
         for gram in grams:

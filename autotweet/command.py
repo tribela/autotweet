@@ -62,6 +62,12 @@ def add_command(args, config):
     atm.add_document(question, answer)
 
 
+def recalc_command(args, config):
+    db_url = config.get('database', 'db_url')
+    atm = AutoAnswer(db_url)
+    atm.recalc_idfs()
+
+
 parser = argparse.ArgumentParser(prog='autotweet')
 parser.add_argument('-c', '--config', help='config file')
 parser.add_argument('-v', '--verbose', default=0, action='count',
@@ -92,11 +98,14 @@ server_parser.add_argument('-p', '--port',
                            help='port number to listen. [default: %(default)s]')
 
 add_parser = subparsers.add_parser(
-    'add',
-    help='manually add question and answer')
+    'add', help='manually add question and answer')
 add_parser.set_defaults(function=add_command)
 add_parser.add_argument('question', help='Question to add')
 add_parser.add_argument('answer', help='Answer to add')
+
+recalc_parser = subparsers.add_parser(
+    'recalc', help='re-calculate idf for all grams')
+recalc_parser.set_defaults(function=recalc_command)
 
 
 config = configparser.ConfigParser()
