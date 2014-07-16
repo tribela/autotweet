@@ -147,6 +147,9 @@ class AutoAnswer():
         if isinstance(gram, Gram):
             gram = gram.gram
 
+        if not isinstance(gram, unicode):
+            gram = gram.decode('utf-8')
+
         return document.text.count(gram) + document.answer.count(gram)
 
     def _get_idf(self, gram):
