@@ -20,6 +20,7 @@ def collector_command(args, config):
     except configparser.NoOptionError:
         token = authorize().to_string()
         config.set('auth', 'token', token)
+        write_config(args, config)
 
     db_url = config.get('database', 'db_url')
     token = config.get('auth', 'token')
@@ -33,6 +34,7 @@ def answer_command(args, config):
     except configparser.NoOptionError:
         answerer_token = authorize().to_string()
         config.set('auth', 'answerer_token', answerer_token)
+        write_config(args, config)
 
     db_url = config.get('database', 'db_url')
     token = config.get('auth', 'answerer_token')
@@ -122,6 +124,13 @@ def set_logging_level(level):
         logging.root.setLevel(logging.DEBUG)
 
 
+
+def write_config(args, config):
+    config_path = args.config or os.path.join(os.getenv('HOME'), '.autotweetrc')
+    with open(config_path, 'w') as fp:
+        config.write(fp)
+
+
 def main():
     args = parser.parse_args()
 
@@ -140,8 +149,8 @@ def main():
     except configparser.NoOptionError:
         db_url = raw_input('db url: ').strip()
         config.set('database', 'db_url', db_url)
-    with open(config_path, 'w') as fp:
-        config.write(fp)
+
+    write_config(args, config)
 
     args.function(args, config)
 
