@@ -1,6 +1,8 @@
 import logging
 import re
 import tweepy
+
+from .database import get_best_answer, get_session
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
 
 MENTION_PATTERN = re.compile(r'(?<=\B@)\w+')
@@ -9,10 +11,10 @@ MENTION_PATTERN = re.compile(r'(?<=\B@)\w+')
 class MentionListener(tweepy.streaming.StreamListener):
     threshold = 0.3
 
-    def __init__(self, api, atm, threshold=None):
+    def __init__(self, api, db_url, threshold=None):
         super(MentionListener, self).__init__()
         self.api = api
-        self.atm = atm
+        self.db_session = get_session(db_url)
         self.me = api.me()
 
         if threshold:
@@ -32,7 +34,7 @@ class MentionListener(tweepy.streaming.StreamListener):
         question = strip_tweet(status.text)
         status_id = status.id
 
-        result = self.atm.get_best_answer(question)
+        result = get_best_answer(self.db_session, question)
         if not result:
             return True
         (answer, ratio) = result
@@ -47,7 +49,7 @@ class MentionListener(tweepy.streaming.StreamListener):
                 status_id)
 
 
-def answer_daemon(token, atm, threshold=None):
+def answer_daemon(token, db_url, threshold=None):
     if not isinstance(token, tweepy.oauth.OAuthToken):
         token = tweepy.oauth.OAuthToken.from_string(token)
 
@@ -55,7 +57,7 @@ def answer_daemon(token, atm, threshold=None):
     auth.set_access_token(token.key, token.secret)
     api = tweepy.API(auth)
 
-    listener = MentionListener(api, atm, threshold=threshold)
+    listener = MentionListener(api, db_url, threshold=threshold)
 
     stream = tweepy.Stream(auth, listener)
     stream.userstream()

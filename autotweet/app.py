@@ -1,20 +1,34 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, g, jsonify, render_template, request
+from . import database
 
 app = Flask(__name__)
 
 
+@app.before_first_request
+def initialize():
+    database.init_db(app.config['DB_URI'])
+
+
+@app.before_request
+def before_request():
+    g.db_session = database.get_session(app.config['DB_URI'])
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    g.db_session.remove()
+
+
 @app.route('/')
 def form():
-    atm = app.config['atm']
-    count = len(atm)
+    count = database.get_count(g.db_session)
     return render_template('form.html', count=count)
 
 
 @app.route('/query/')
 def result():
-    atm = app.config['atm']
     query = request.args['query']
-    result = atm.get_best_answer(query)
+    result = database.get_best_answer(g.db_session, query)
     if not result:
         r = jsonify()
         r.status_code = 404
@@ -34,7 +48,7 @@ def teach():
     answer = request.form['answer'].strip()
 
     if question and answer:
-        app.config['atm'].add_document(question, answer)
+        database.add_document(g.db_session, question, answer)
         return ''
 
     return ('', 400)

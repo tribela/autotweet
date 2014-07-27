@@ -9,7 +9,7 @@ import waitress
 
 from .answer import answer_daemon
 from .app import app
-from .database import AutoAnswer
+from .database import add_document, get_session, init_db, recalc_idfs
 from .learn import learning_daemon
 from .twitter import authorize
 
@@ -24,8 +24,7 @@ def collector_command(args, config):
     db_url = config.get('database', 'db_url')
     token = config.get('auth', 'token')
 
-    atm = AutoAnswer(db_url)
-    learning_daemon(token, atm)
+    learning_daemon(token, db_url)
 
 
 def answer_command(args, config):
@@ -42,30 +41,29 @@ def answer_command(args, config):
     except:
         threshold = None
 
-    atm = AutoAnswer(db_url)
-    answer_daemon(token, atm, threshold=threshold)
+    answer_daemon(token, db_url, threshold=threshold)
 
 
 def server_command(args, config):
     db_url = config.get('database', 'db_url')
-    atm = AutoAnswer(db_url)
-    app.config.update(atm=atm)
+    app.config['DB_URI'] = db_url
     waitress.serve(app, host=args.host, port=args.port)
 
 
 def add_command(args, config):
     db_url = config.get('database', 'db_url')
-    atm = AutoAnswer(db_url)
     question = args.question.decode('utf-8')
     answer = args.answer.decode('utf-8')
 
-    atm.add_document(question, answer)
+    session = get_session(db_url)
+
+    add_document(session, question, answer)
 
 
 def recalc_command(args, config):
     db_url = config.get('database', 'db_url')
-    atm = AutoAnswer(db_url)
-    atm.recalc_idfs()
+    session = get_session(db_url)
+    recalc_idfs(session)
 
 
 parser = argparse.ArgumentParser(prog='autotweet')
@@ -138,6 +136,7 @@ def main():
 
     try:
         db_url = config.get('database', 'db_url')
+        init_db(db_url)
     except configparser.NoOptionError:
         db_url = raw_input('db url: ').strip()
         config.set('database', 'db_url', db_url)
