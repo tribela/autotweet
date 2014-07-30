@@ -47,15 +47,16 @@ class Gram(Base):
 def init_db(url):
     engine = create_engine(url)
     db_session = scoped_session(
-        sessionmaker(engine, autoflush=True, autocommit=False))
+        sessionmaker(engine))
     Base.metadata.create_all(engine)
     Base.query = db_session.query_property()
+    db_session.close()
 
 
 def get_session(url):
     engine = create_engine(url)
     db_session = scoped_session(
-        sessionmaker(engine, autoflush=True, autocommit=False))
+        sessionmaker(engine, autoflush=True, autocommit=True))
     return db_session
 
 
@@ -69,7 +70,7 @@ def add_document(session, question, answer):
         return
     logging.info(u'add document: {0} -> {1}'.format(question, answer))
 
-    session.begin(subtransactions=True)
+    session.begin()
 
     grams = _get_grams(session, question, make=True)
 
@@ -88,7 +89,7 @@ def get_best_answer(session, query):
     if len(query) < GRAM_LENGTH:
         return
 
-    session.begin(subtransactions=True)
+    session.begin()
 
     grams = _get_grams(session, query)
     documents = set([doc for gram in grams for doc in gram.documents])
@@ -117,7 +118,7 @@ def get_best_answer(session, query):
 
 
 def recreate_grams(session):
-    session.begin(subtransactions=True)
+    session.begin()
 
     for document in session.query(Document).all():
         grams = _get_grams(session, document.text, make=True)
