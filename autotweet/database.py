@@ -60,12 +60,25 @@ def get_session(url):
 
 
 def add_document(session, question, answer):
+    question = question.strip()
+    answer = answer.strip()
+
     if session.query(Document)\
             .filter_by(text=question, answer=answer).count():
         logging.info(u'Already here: {0} -> {1}'.format(question, answer))
         return
     logging.info(u'add document: {0} -> {1}'.format(question, answer))
-    _add_doc(session, question, answer)
+
+    session.begin(subtransactions=True)
+
+    grams = _get_grams(session, question, make=True)
+
+    doc = Document(question, answer)
+    doc.grams = list(grams)
+    recalc_idfs(session, grams)
+
+    session.add(doc)
+    session.commit()
 
 
 def get_best_answer(session, query):
@@ -131,25 +144,6 @@ def recalc_idfs(session, grams=None):
 
 def get_count(session):
     return session.query(Document).count()
-
-
-def _add_doc(session, question, answer):
-    question = question.strip()
-    answer = answer.strip()
-    if session.query(Document)\
-            .filter_by(text=question, answer=answer).count():
-        return
-
-    session.begin(subtransactions=True)
-
-    grams = _get_grams(session, question, make=True)
-
-    doc = Document(question, answer)
-    doc.grams = list(grams)
-    recalc_idfs(session, grams)
-
-    session.add(doc)
-    session.commit()
 
 
 def _get_grams(session, text, make=False):
