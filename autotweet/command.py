@@ -125,14 +125,18 @@ config.add_section('database')
 
 
 def set_logging_level(level):
-    logging.basicConfig(format='%(levelname)s: %(message)s')
 
     if not level:
-        logging.root.setLevel(logging.WARNING)
+        log_level = logging.WARNING
     elif level == 1:
-        logging.root.setLevel(logging.INFO)
+        log_level = logging.INFO
     else:
-        logging.root.setLevel(logging.DEBUG)
+        log_level = logging.DEBUG
+
+    logging.basicConfig(format='%(asctime)s {%(module)s:%(levelname)s}: %(message)s',
+                       datefmt='%Y-%m-%d %H:%M:%S')
+    logging.getLogger('database').setLevel(log_level)
+    logging.getLogger('answer').setLevel(log_level)
 
 
 

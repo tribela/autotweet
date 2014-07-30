@@ -13,6 +13,8 @@ __all__ = ('Document', 'Gram', 'init_db', 'get_session', 'add_document',
 Base = declarative_base()
 GRAM_LENGTH = 2
 
+logger = logging.getLogger('database')
+
 
 association_table = Table(
     'association', Base.metadata,
@@ -66,9 +68,9 @@ def add_document(session, question, answer):
 
     if session.query(Document)\
             .filter_by(text=question, answer=answer).count():
-        logging.info(u'Already here: {0} -> {1}'.format(question, answer))
+        logger.info(u'Already here: {0} -> {1}'.format(question, answer))
         return
-    logging.info(u'add document: {0} -> {1}'.format(question, answer))
+    logger.info(u'add document: {0} -> {1}'.format(question, answer))
 
     session.begin()
 
@@ -111,7 +113,7 @@ def get_best_answer(session, query):
                    if docs.get(answer) == max_ratio]
 
         answer = random.choice(answers)
-        logging.debug(u'{0} -> {1} ({2})'.format(query, answer, max_ratio))
+        logger.debug(u'{0} -> {1} ({2})'.format(query, answer, max_ratio))
         return (answer, max_ratio)
     except ValueError:
         return None
