@@ -9,7 +9,8 @@ import waitress
 
 from .answer import answer_daemon
 from .app import app
-from .database import add_document, get_session, init_db, recalc_idfs
+from .database import (add_document, get_session, init_db, recalc_idfs,
+                       recreate_grams)
 from .learn import learning_daemon
 from .twitter import authorize
 
@@ -68,6 +69,12 @@ def recalc_command(args, config):
     recalc_idfs(session)
 
 
+def recreate_command(args, config):
+    db_url = config.get('database', 'db_url')
+    session = get_session(db_url)
+    recreate_grams(session)
+
+
 parser = argparse.ArgumentParser(prog='autotweet')
 parser.add_argument('-c', '--config', help='config file')
 parser.add_argument('-v', '--verbose', default=0, action='count',
@@ -106,6 +113,10 @@ add_parser.add_argument('answer', help='Answer to add')
 recalc_parser = subparsers.add_parser(
     'recalc', help='re-calculate idf for all grams')
 recalc_parser.set_defaults(function=recalc_command)
+
+recreate_parser = subparsers.add_parser(
+    'recreate', help='re-create grams for all documents')
+recreate_parser.set_defaults(function=recreate_command)
 
 
 config = configparser.ConfigParser()
