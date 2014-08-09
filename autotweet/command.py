@@ -133,11 +133,11 @@ def set_logging_level(level):
     else:
         log_level = logging.DEBUG
 
-    logging.basicConfig(format='%(asctime)s {%(module)s:%(levelname)s}: %(message)s',
-                       datefmt='%Y-%m-%d %H:%M:%S')
+    logging.basicConfig(
+        format='%(asctime)s {%(module)s:%(levelname)s}: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S')
     logging.getLogger('database').setLevel(log_level)
     logging.getLogger('answer').setLevel(log_level)
-
 
 
 def write_config(args, config):
