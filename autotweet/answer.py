@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 import tweepy
 
 from .database import get_best_answer, get_session
@@ -12,6 +13,7 @@ logger = logging.getLogger('answer')
 
 class MentionListener(tweepy.streaming.StreamListener):
     threshold = 0.3
+    friends_timeout = 60
 
     def __init__(self, api, db_url, threshold=None):
         super(MentionListener, self).__init__()
@@ -22,6 +24,14 @@ class MentionListener(tweepy.streaming.StreamListener):
         if threshold:
             self.threshold = threshold
 
+    def get_friends(self):
+        if self.friends_updated is None or \
+           time.time() - self.friends_updated > self.friends_timeout:
+            self.friends = set(user.screen_name for user in self.api.friends) &\
+                set(user.screen_name for user in self.api.followers)
+            self.friends_updated = time.time()
+        return self.friends
+
     def on_status(self, status):
         if hasattr(status, 'retweeted_status'):
             return True
@@ -30,6 +40,7 @@ class MentionListener(tweepy.streaming.StreamListener):
         mentions = set(MENTION_PATTERN.findall(status.text))
         mentions.discard(user_name)
         mentions.discard(self.me.screen_name)
+        mentions = mentions - self.get_friends()
         mentions = [user_name] + list(mentions)
         mentions = map(lambda x: '@' + x, mentions)
 
