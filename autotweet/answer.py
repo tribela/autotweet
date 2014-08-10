@@ -28,8 +28,9 @@ class MentionListener(tweepy.streaming.StreamListener):
     def get_friends(self):
         if self.friends_updated is None or \
            time.time() - self.friends_updated > self.friends_timeout:
-            self.friends = set(user.screen_name for user in self.api.friends) &\
-                set(user.screen_name for user in self.api.followers)
+            followings = set(user.screen_name for user in self.api.friends())
+            followers = set(user.screen_name for user in self.api.followers())
+            self.friends = followings | followers
             self.friends_updated = time.time()
         return self.friends
 
