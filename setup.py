@@ -1,5 +1,6 @@
 import os.path
 import sys
+from pip.req import parse_requirements
 
 try:
     from setuptools import find_packages, setup
@@ -17,9 +18,9 @@ def readme():
         return ''
 
 
-install_requires = ['flask', 'sqlalchemy', 'tweepy', 'waitress']
+install_reqs = [str(ir.req) for ir in parse_requirements('requirements.txt')]
 if sys.version_info < (3, 2):
-    install_requires.append('futures')
+    install_reqs.append('futures')
 
 
 setup(
@@ -36,6 +37,6 @@ setup(
         ]
     },
     packages=find_packages(exclude=['tests']),
-    install_requires=install_requires,
+    install_requires=install_reqs,
     tests_require=['pytest >= 2.4.0'],
 )
