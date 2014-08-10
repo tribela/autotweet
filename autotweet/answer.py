@@ -14,6 +14,7 @@ logger = logging.getLogger('answer')
 class MentionListener(tweepy.streaming.StreamListener):
     threshold = 0.3
     friends_timeout = 60
+    friends_updated = None
 
     def __init__(self, api, db_url, threshold=None):
         super(MentionListener, self).__init__()
