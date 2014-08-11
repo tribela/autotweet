@@ -1,6 +1,7 @@
 import os.path
 import sys
 from pip.req import parse_requirements
+from autotweet import __version__ as version
 
 try:
     from setuptools import find_packages, setup
@@ -25,6 +26,7 @@ if sys.version_info < (3, 2):
 
 setup(
     name='autotweet',
+    version=version,
     description='learn your tweet and auto tweet it.',
     long_description=readme(),
     url='http://kjwon15.ftp.sh/',
