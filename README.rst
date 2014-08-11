@@ -34,16 +34,6 @@ Your clone account can automatic answer by answer command.
    $ autotweet answer
 
 
-Web chatting
-~~~~~~~~~~~~
-
-You can test answer or chatting on web by server command.
-
-.. code-block:: console
-
-   $ autotweet server
-
-
 Add manually
 ~~~~~~~~~~~~
 

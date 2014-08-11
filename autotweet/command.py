@@ -5,10 +5,8 @@ except ImportError:
 import argparse
 import logging
 import os
-import waitress
 
 from .answer import answer_daemon
-from .app import app
 from .database import (add_document, get_session, init_db, recalc_idfs,
                        recreate_grams)
 from .learn import learning_daemon
@@ -45,12 +43,6 @@ def answer_command(args, config):
         threshold = None
 
     answer_daemon(token, db_url, threshold=threshold)
-
-
-def server_command(args, config):
-    db_url = config.get('database', 'db_url')
-    app.config['DB_URI'] = db_url
-    waitress.serve(app, host=args.host, port=args.port)
 
 
 def add_command(args, config):
@@ -91,18 +83,6 @@ answer_parser = subparsers.add_parser(
     'answer',
     help='Auto answer to mentions.')
 answer_parser.set_defaults(function=answer_command)
-
-server_parser = subparsers.add_parser(
-    'server',
-    help='server for simsim webservice')
-server_parser.set_defaults(function=server_command)
-server_parser.add_argument('-H', '--host',
-                           default='0.0.0.0',
-                           help='Host to listen. [default: %(default)s]')
-server_parser.add_argument('-p', '--port',
-                           type=int,
-                           default=5000,
-                           help='port number to listen. [default: %(default)s]')
 
 add_parser = subparsers.add_parser(
     'add', help='manually add question and answer')

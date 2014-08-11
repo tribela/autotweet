@@ -1,4 +1,2 @@
-flask>=0.10.1
 sqlalchemy>=0.9.6
 tweepy>=2.3.0
-waitress>=0.8.9
