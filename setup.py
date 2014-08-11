@@ -1,6 +1,5 @@
 import os.path
 import sys
-from pip.req import parse_requirements
 from autotweet import __version__ as version
 
 try:
@@ -19,7 +18,10 @@ def readme():
         return ''
 
 
-install_reqs = [str(ir.req) for ir in parse_requirements('requirements.txt')]
+install_reqs = [
+    'sqlalchemy>=0.9.6',
+    'tweepy>=2.3.0'
+]
 if sys.version_info < (3, 2):
     install_reqs.append('futures')
 

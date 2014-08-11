@@ -1,2 +1,0 @@
-sqlalchemy>=0.9.6
-tweepy>=2.3.0
