@@ -29,7 +29,7 @@ setup(
     version=version,
     description='learn your tweet and auto tweet it.',
     long_description=readme(),
-    url='http://kjwon15.ftp.sh/',
+    url='http://kjwon15.net/',
     download_url='https://github.com/Kjwon15/autotweet/releases',
     author='Kjwon15',
     author_email='kjwonmail' '@' 'gmail.com',
