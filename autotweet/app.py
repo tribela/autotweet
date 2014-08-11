@@ -1,12 +1,20 @@
+import logging
 from flask import Flask, g, jsonify, render_template, request
 from . import database
 
 app = Flask(__name__)
 
+logger = logging.getLogger('web')
+
 
 @app.before_first_request
 def initialize():
     database.init_db(app.config['DB_URI'])
+
+    log_file = app.config.get('LOG_FILE', None)
+    if log_file:
+        file_handler = logging.FileHandler(log_file)
+        logger.addHandler(file_handler)
 
 
 @app.before_request
@@ -35,6 +43,8 @@ def result():
         return r
 
     answer, ratio = result
+
+    logger.info(u'{0} -> {1} ({2})'.format(query, answer, ratio))
 
     return jsonify({
         'answer': answer,
