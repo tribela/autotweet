@@ -35,6 +35,7 @@ setup(
     download_url='https://github.com/Kjwon15/autotweet/releases',
     author='Kjwon15',
     author_email='kjwonmail' '@' 'gmail.com',
+    license='MIT',
     entry_points={
         'console_scripts': [
             'autotweet = autotweet.command:main'

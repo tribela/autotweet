@@ -60,3 +60,9 @@ You can configure Autotweet by editing ``~/.autotweetrc`` file.
 
    [answer]
    threshold = <Auto answering to tweet that is not mention to answerer. (float 0.0 ~ 1.0)>
+
+
+License
+-------
+
+Autotweet is following MIT license.
