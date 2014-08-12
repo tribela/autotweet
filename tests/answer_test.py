@@ -1,13 +1,27 @@
-from autotweet.database import AutoAnswer
+import os
+from pytest import fixture
+from autotweet.database import (add_document, get_session, init_db,
+                                get_best_answer)
+
+@fixture
+def fx_session(tmpdir):
+    tmpdir = str(tmpdir)
+    db_file = os.path.join(tmpdir, 'tmp.db')
+    if os.path.exists(db_file):
+        os.unlink(db_file)
+    db_url = 'sqlite:///' + db_file
+
+    init_db(db_url)
+    return get_session(db_url)
 
 
-def test_answers():
-    aa = AutoAnswer('sqlite:///:memory:')
-    aa.add_document(u'I like yummy cake', u'yummy cake')
-    aa.add_document(u'I like scary cake', u'scary cake')
+def test_answers(fx_session):
+    session = fx_session
+    add_document(session, u'I like yummy cake', u'yummy cake')
+    add_document(session, u'I like scary cake', u'scary cake')
 
-    answer, ratio = aa.get_best_answer(u'yummy pie')
+    answer, ratio = get_best_answer(session, u'yummy pie')
     assert answer == u'yummy cake'
-    answer, ratio = aa.get_best_answer(u'scary pie')
+    answer, ratio = get_best_answer(session, u'scary pie')
     assert answer == u'scary cake'
-    assert not aa.get_best_answer(u'blabla')
+    assert not get_best_answer(session, u'blabla')
