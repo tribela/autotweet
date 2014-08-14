@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 
 
-__all__ = ('Document', 'Gram', 'init_db', 'get_session', 'add_document',
+__all__ = ('Document', 'Gram', 'get_session', 'add_document',
            'get_best_answer', 'recreate_grams', 'recalc_idfs')
 
 
@@ -46,19 +46,12 @@ class Gram(Base):
         self.gram = gram
 
 
-def init_db(url):
-    engine = create_engine(url)
-    db_session = scoped_session(
-        sessionmaker(engine))
-    Base.metadata.create_all(engine)
-    Base.query = db_session.query_property()
-    db_session.close()
-
-
 def get_session(url):
     engine = create_engine(url)
     db_session = scoped_session(
         sessionmaker(engine, autoflush=True, autocommit=True))
+    Base.metadata.create_all(engine)
+    Base.query = db_session.query_property()
     return db_session
 
 

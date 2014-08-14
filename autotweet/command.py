@@ -7,7 +7,7 @@ import logging
 import os
 
 from .answer import answer_daemon
-from .database import (add_document, get_session, init_db, recalc_idfs,
+from .database import (add_document, get_session, recalc_idfs,
                        recreate_grams)
 from .learn import learning_daemon
 from .twitter import authorize
@@ -140,7 +140,6 @@ def main():
 
     try:
         db_url = config.get('database', 'db_url')
-        init_db(db_url)
     except configparser.NoOptionError:
         db_url = raw_input('db url: ').strip()
         config.set('database', 'db_url', db_url)

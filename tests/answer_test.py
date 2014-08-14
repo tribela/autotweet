@@ -1,18 +1,11 @@
-import os
 from pytest import fixture
-from autotweet.database import (add_document, get_session, init_db,
-                                get_best_answer)
+from autotweet.database import (add_document, get_session, get_best_answer)
 
 
 @fixture
-def fx_session(tmpdir):
-    tmpdir = str(tmpdir)
-    db_file = os.path.join(tmpdir, 'tmp.db')
-    if os.path.exists(db_file):
-        os.unlink(db_file)
-    db_url = 'sqlite:///' + db_file
+def fx_session():
+    db_url = 'sqlite:///:memory:'
 
-    init_db(db_url)
     return get_session(db_url)
 
 
