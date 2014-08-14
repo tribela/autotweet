@@ -3,6 +3,10 @@ Autotweet
 
 Learn your response pattern on twitter.
 
+.. image:: https://travis-ci.org/Kjwon15/autotweet.svg?branch=master
+    :target: https://travis-ci.org/Kjwon15/autotweet
+
+
 Installation
 ------------
 
