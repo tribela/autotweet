@@ -3,6 +3,7 @@ from pytest import fixture
 from autotweet.database import (add_document, get_session, init_db,
                                 get_best_answer)
 
+
 @fixture
 def fx_session(tmpdir):
     tmpdir = str(tmpdir)
