@@ -1,7 +1,8 @@
 import logging
 import math
 import random
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, create_engine
+from sqlalchemy import (Column, Float,  ForeignKey, Integer, String, Table,
+                        create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 
@@ -40,7 +41,7 @@ class Gram(Base):
     __tablename__ = 'grams'
     id = Column(Integer, primary_key=True)
     gram = Column(String(GRAM_LENGTH), unique=True, nullable=False)
-    idf = Column(Integer)
+    idf = Column(Float)
 
     def __init__(self, gram):
         self.gram = gram

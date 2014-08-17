@@ -1,4 +1,5 @@
 0.2
 ---
 
-- Remove `database.init_db`
+- Remove `database.init_db`.
+- Modify column `idf` to real number.
