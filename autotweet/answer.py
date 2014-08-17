@@ -58,9 +58,14 @@ class MentionListener(tweepy.streaming.StreamListener):
             logger.info(u'@{0.user.screen_name}: {0.text} -> {1}'.format(
                 status, answer
                 ))
-            self.api.update_status(
-                u'{0} {1}'.format(' '.join(mentions), answer),
-                status_id)
+            try:
+                self.api.update_status(
+                    u'{0} {1}'.format(' '.join(mentions), answer),
+                    status_id)
+            except tweepy.error.TweepError as e:
+                logger.error(u'Failed to update status: {0}'.format(
+                    e.message
+                ))
 
 
 def answer_daemon(token, db_url, threshold=None):
