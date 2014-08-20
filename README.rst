@@ -38,6 +38,17 @@ Your clone account can automatic answer by answer command.
    $ autotweet answer
 
 
+Automaticaly tweet after death
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Autotweet can be auto tweeting using your main account.
+Use it when you are leaving from twitter for any reason.
+
+.. code-block:: console
+
+   $ autotweet after_death
+
+
 Add manually
 ~~~~~~~~~~~~
 
@@ -58,12 +69,16 @@ You can configure Autotweet by editing ``~/.autotweetrc`` file.
    [auth]
    token = <OAuth token (automaticaly generated)>
    answerer_token = <OAuth token (automaticaly generated)>
-   
+
    [database]
    db_url = <database url>
 
    [answer]
    threshold = <Auto answering to tweet that is not mention to answerer. (float 0.0 ~ 1.0)>
+
+   [tweet after death]
+   message0 = This is message sent by auto tweet.
+   message1 = If you are reading this, I'm already died.
 
 
 License
