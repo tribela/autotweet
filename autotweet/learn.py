@@ -2,6 +2,8 @@ import tweepy
 from .database import add_document, get_session
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
 
+MY_CLIENT_NAME = 'learn your tweet'
+
 
 class MyMentionListener(tweepy.streaming.StreamListener):
 
@@ -16,6 +18,8 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             return True
 
         if status.user.id == self.me.id and status.in_reply_to_status_id:
+            if status.source == MY_CLIENT_NAME:
+                return True
             original_status = self.api.get_status(status.in_reply_to_status_id)
 
             question = strip_tweet(original_status.text)
