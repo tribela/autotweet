@@ -5,12 +5,16 @@ except ImportError:
 import argparse
 import logging
 import os
+import tweepy
 
 from .answer import answer_daemon
 from .database import (add_document, get_session, recalc_idfs,
                        recreate_grams)
 from .learn import learning_daemon
-from .twitter import authorize
+from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET
+
+
+logger = logging.getLogger('command')
 
 
 def collector_command(args, config):
@@ -43,6 +47,41 @@ def answer_command(args, config):
         threshold = None
 
     answer_daemon(token, db_url, threshold=threshold)
+
+
+def after_death_command(args, config):
+    try:
+        my_token = config.get('auth', 'token')
+    except configparser.NoOptionError:
+        my_token = authorize().to_string()
+        config.set('auth', 'token', my_token)
+        write_config(args, config)
+
+    token = tweepy.oauth.OAuthToken.from_string(my_token)
+    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    auth.set_access_token(token.key, token.secret)
+    api = tweepy.API(auth)
+
+    try:
+        auto_tweets = config.items('tweet after death')
+    except configparser.NoOptionError:
+        auto_tweets = []
+
+    for key, item in auto_tweets:
+        try:
+            api.update_status(item)
+            logger.info(u'Tweet item: {0}'.format(item))
+        except tweepy.error.TweepError as e:
+            logger.error(u'Failed to update status: {0}'.format(e.message))
+
+    db_url = config.get('database', 'db_url')
+
+    try:
+        threshold = config.getfloat('answer', 'threshold')
+    except:
+        threshold = None
+
+    answer_daemon(my_token, db_url, threshold=threshold)
 
 
 def add_command(args, config):
@@ -84,6 +123,12 @@ answer_parser = subparsers.add_parser(
     help='Auto answer to mentions.')
 answer_parser.set_defaults(function=answer_command)
 
+after_death_parser = subparsers.add_parser(
+    'after_death',
+    help='tweet after death.'
+    ' When you run this command, you has be replaced by autotweet.')
+after_death_parser.set_defaults(function=after_death_command)
+
 add_parser = subparsers.add_parser(
     'add', help='manually add question and answer')
 add_parser.set_defaults(function=add_command)
@@ -102,6 +147,7 @@ recreate_parser.set_defaults(function=recreate_command)
 config = configparser.ConfigParser()
 config.add_section('auth')
 config.add_section('database')
+config.add_section('tweet after death')
 
 
 def set_logging_level(level):
@@ -118,6 +164,7 @@ def set_logging_level(level):
         datefmt='%Y-%m-%d %H:%M:%S')
     logging.getLogger('database').setLevel(log_level)
     logging.getLogger('answer').setLevel(log_level)
+    logging.getLogger('command').setLevel(log_level)
 
 
 def write_config(args, config):
