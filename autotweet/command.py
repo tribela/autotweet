@@ -168,6 +168,7 @@ def set_logging_level(level):
     logging.getLogger('database').setLevel(log_level)
     logging.getLogger('answer').setLevel(log_level)
     logging.getLogger('command').setLevel(log_level)
+    logging.getLogger('collector').setLevel(log_level)
 
 
 def write_config(args, config):

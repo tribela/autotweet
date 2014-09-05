@@ -1,9 +1,11 @@
+import logging
 import time
 import tweepy
 from .database import add_document, get_session
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
 
 MY_CLIENT_NAME = 'learn your tweet'
+logger = logging.getLogger('collector')
 
 
 class MyMentionListener(tweepy.streaming.StreamListener):
@@ -37,8 +39,10 @@ def polling_timeline(api, db_url):
     me = api.me()
     last_id = me.status.id
 
+    logger.debug('tracking from status id: {0}'.format(last_id))
     while 1:
         time.sleep(60)
+        logger.debug('polling from status id: {0}'.format(last_id))
         statuses = me.timeline(since_id=last_id)
         if statuses:
             statuses.reverse()
