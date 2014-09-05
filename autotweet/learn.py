@@ -1,3 +1,4 @@
+import time
 import tweepy
 from .database import add_document, get_session
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
@@ -31,7 +32,37 @@ class MyMentionListener(tweepy.streaming.StreamListener):
         return True
 
 
-def learning_daemon(token, db_url):
+def polling_timeline(api, db_url):
+    db_session = get_session(db_url)
+    me = api.me()
+    last_id = me.status.id
+
+    while time.sleep(60):
+        statuses = me.timeline(since_id=last_id)
+        if statuses:
+            statuses.reverse()
+            last_id = statuses[-1].id
+        else:
+            continue
+
+        for status in statuses:
+            if status.source == MY_CLIENT_NAME:
+                continue
+            if hasattr(status, 'retweeted_status'):
+                continue
+            if not status.in_reply_to_status_id:
+                continue
+
+            original_status = api.get_status(status.in_reply_to_status_id)
+
+            question = strip_tweet(original_status.text)
+            answer = strip_tweet(status.text, remove_url=False)
+
+            if question and answer:
+                add_document(db_session, question, answer)
+
+
+def learning_daemon(token, db_url, streaming=False):
     if not isinstance(token, tweepy.oauth.OAuthToken):
         token = tweepy.oauth.OAuthToken.from_string(token)
 
@@ -39,7 +70,10 @@ def learning_daemon(token, db_url):
     auth.set_access_token(token.key, token.secret)
     api = tweepy.API(auth)
 
-    listener = MyMentionListener(api, db_url)
+    if streaming:
+        listener = MyMentionListener(api, db_url)
 
-    stream = tweepy.Stream(auth, listener)
-    stream.userstream()
+        stream = tweepy.Stream(auth, listener)
+        stream.userstream()
+    else:
+        polling_timeline(api, db_url)

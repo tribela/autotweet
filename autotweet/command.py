@@ -28,7 +28,7 @@ def collector_command(args, config):
     db_url = config.get('database', 'db_url')
     token = config.get('auth', 'token')
 
-    learning_daemon(token, db_url)
+    learning_daemon(token, db_url, args.stream)
 
 
 def answer_command(args, config):
@@ -117,6 +117,9 @@ collector_parser = subparsers.add_parser(
     'collector',
     help='tweet collector for database')
 collector_parser.set_defaults(function=collector_command)
+collector_parser.add_argument('-s', '--stream',
+                              help='use streaming to collect tweet',
+                              action='store_true', default=False)
 
 answer_parser = subparsers.add_parser(
     'answer',

@@ -6,3 +6,4 @@
 - Handle Twitter error on answer.
 - Add `after_death` command for tweet after you died.
 - Don't learn from answer by autotweet self.
+- Option for use polling instead of streaming.
