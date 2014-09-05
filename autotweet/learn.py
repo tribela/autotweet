@@ -37,7 +37,8 @@ def polling_timeline(api, db_url):
     me = api.me()
     last_id = me.status.id
 
-    while time.sleep(60):
+    while 1:
+        time.sleep(60)
         statuses = me.timeline(since_id=last_id)
         if statuses:
             statuses.reverse()
