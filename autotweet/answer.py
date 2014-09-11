@@ -91,9 +91,12 @@ def polling_timeline(api, db_url, threshold=None):
         time.sleep(60)
         friends = get_friends(api)
 
-        # TODO: use api.mentions_timeline()
         logger.debug('polling from status id: {0}'.format(last_id))
-        statuses = api.home_timeline(since_id=last_id)
+        if not threshold:
+            statuses = api.mentions_timeline(since_id=last_id)
+        else:
+            statuses = api.home_timeline(since_id=last_id)
+
         if statuses:
             statuses.reverse()
             last_id = statuses[-1].id
