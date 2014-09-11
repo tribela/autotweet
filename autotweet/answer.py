@@ -123,9 +123,6 @@ def polling_timeline(api, db_url, threshold=None):
                     ))
 
 
-
-
-
 def answer_daemon(token, db_url, streaming=False, threshold=None):
     if not isinstance(token, tweepy.oauth.OAuthToken):
         token = tweepy.oauth.OAuthToken.from_string(token)

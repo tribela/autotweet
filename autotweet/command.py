@@ -126,8 +126,8 @@ answer_parser = subparsers.add_parser(
     help='Auto answer to mentions.')
 answer_parser.set_defaults(function=answer_command)
 answer_parser.add_argument('-s', '--stream',
-                              help='use streaming to collect tweet',
-                              action='store_true', default=False)
+                           help='use streaming to collect tweet',
+                           action='store_true', default=False)
 
 after_death_parser = subparsers.add_parser(
     'after_death',
