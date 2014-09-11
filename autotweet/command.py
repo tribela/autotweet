@@ -46,7 +46,7 @@ def answer_command(args, config):
     except:
         threshold = None
 
-    answer_daemon(token, db_url, threshold=threshold)
+    answer_daemon(token, db_url, args.stream, threshold=threshold)
 
 
 def after_death_command(args, config):
@@ -125,6 +125,9 @@ answer_parser = subparsers.add_parser(
     'answer',
     help='Auto answer to mentions.')
 answer_parser.set_defaults(function=answer_command)
+answer_parser.add_argument('-s', '--stream',
+                              help='use streaming to collect tweet',
+                              action='store_true', default=False)
 
 after_death_parser = subparsers.add_parser(
     'after_death',
