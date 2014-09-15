@@ -30,3 +30,17 @@ def test_count(fx_session):
     assert get_count(session) == 1
     add_document(session, u'this is an apple.', u'I like apple.')
     assert get_count(session) == 1
+
+
+def test_short_question(fx_session):
+    session = fx_session
+    assert get_count(session) == 0
+
+    add_document(session, u'c', u'cake')
+    add_document(session, u'l', u'lie')
+
+    answer, ratio = get_best_answer(session, u'c')
+    assert answer == u'cake'
+
+    answer, ratio = get_best_answer(session, u'l')
+    assert answer == u'lie'
