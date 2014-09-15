@@ -88,9 +88,6 @@ def get_best_answer(session, query):
     if not isinstance(query, unicode):
         query = query.decode('utf-8')
 
-    if len(query) < GRAM_LENGTH:
-        return
-
     session.begin()
 
     grams = _get_grams(session, query)
@@ -153,15 +150,24 @@ def _get_grams(session, text, make=False):
     grams = set()
     session.begin(subtransactions=True)
 
-    for i in range(len(text) - GRAM_LENGTH + 1):
-        gram = text[i:i+GRAM_LENGTH]
-        gram_obj = session.query(Gram).filter_by(gram=gram).first()
+    if len(text) < GRAM_LENGTH:
+        gram_obj = session.query(Gram).filter_by(gram=text).first()
         if gram_obj:
             grams.add(gram_obj)
         elif make:
-            gram_obj = Gram(gram)
+            gram_obj = Gram(text)
             session.add(gram_obj)
             grams.add(gram_obj)
+    else:
+        for i in range(len(text) - GRAM_LENGTH + 1):
+            gram = text[i:i+GRAM_LENGTH]
+            gram_obj = session.query(Gram).filter_by(gram=gram).first()
+            if gram_obj:
+                grams.add(gram_obj)
+            elif make:
+                gram_obj = Gram(gram)
+                session.add(gram_obj)
+                grams.add(gram_obj)
 
     session.commit()
     return grams

@@ -1,13 +1,46 @@
-from autotweet.database import AutoAnswer
+from pytest import fixture
+from autotweet.database import (add_document, get_count, get_session,
+                                get_best_answer)
 
 
-def test_answers():
-    aa = AutoAnswer('sqlite:///:memory:')
-    aa.add_document(u'I like yummy cake', u'yummy cake')
-    aa.add_document(u'I like scary cake', u'scary cake')
+@fixture
+def fx_session():
+    db_url = 'sqlite:///:memory:'
 
-    answer, ratio = aa.get_best_answer(u'yummy pie')
+    return get_session(db_url)
+
+
+def test_answers(fx_session):
+    session = fx_session
+    add_document(session, u'I like yummy cake', u'yummy cake')
+    add_document(session, u'I like scary cake', u'scary cake')
+
+    answer, ratio = get_best_answer(session, u'yummy pie')
     assert answer == u'yummy cake'
-    answer, ratio = aa.get_best_answer(u'scary pie')
+    answer, ratio = get_best_answer(session, u'scary pie')
     assert answer == u'scary cake'
-    assert not aa.get_best_answer(u'blabla')
+    assert not get_best_answer(session, u'blabla')
+
+
+def test_count(fx_session):
+    session = fx_session
+    assert get_count(session) == 0
+
+    add_document(session, u'this is an apple.', u'I like apple.')
+    assert get_count(session) == 1
+    add_document(session, u'this is an apple.', u'I like apple.')
+    assert get_count(session) == 1
+
+
+def test_short_question(fx_session):
+    session = fx_session
+    assert get_count(session) == 0
+
+    add_document(session, u'c', u'cake')
+    add_document(session, u'l', u'lie')
+
+    answer, ratio = get_best_answer(session, u'c')
+    assert answer == u'cake'
+
+    answer, ratio = get_best_answer(session, u'l')
+    assert answer == u'lie'
