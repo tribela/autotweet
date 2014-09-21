@@ -13,7 +13,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 
 
-__all__ = ('Document', 'Gram', 'get_session', 'add_document',
+__all__ = ('Document', 'Gram', 'get_count', 'get_session', 'add_document',
            'get_best_answer', 'recreate_grams', 'recalc_idfs')
 
 
