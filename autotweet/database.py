@@ -107,7 +107,7 @@ def get_best_answer(session, query):
         logger.debug(u'{0} -> {1} ({2})'.format(query, answer, max_ratio))
         return (answer, max_ratio)
     except ValueError:
-        return None
+        raise NoAnswerError('Can not found answer')
 
 
 def recreate_grams(session):
@@ -204,3 +204,12 @@ def _cosine_measure(v1, v2):
         return numerator / denominator
     except ZeroDivisionError:
         return 0
+
+
+class NoAnswerError(Exception):
+
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)

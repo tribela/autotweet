@@ -1,3 +1,9 @@
+0.2.1
+-----
+
+- Raise `NoAnswerError` when can not found answer.
+
+
 0.2
 ---
 
