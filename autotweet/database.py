@@ -54,6 +54,15 @@ class Gram(Base):
 
 
 def get_session(url):
+    """Get db session.
+
+    :param url: URL for connect with DB
+    :type url: :class:`str`
+
+    :returns: A sqlalchemy db session
+    :rtype: :class:`sqlalchemy.orm.Session`
+
+    """
     engine = create_engine(url)
     db_session = scoped_session(
         sessionmaker(engine, autoflush=True, autocommit=True))
@@ -63,6 +72,18 @@ def get_session(url):
 
 
 def add_document(session, question, answer):
+    """Add question answer set to DB.
+
+    :param session: DB session
+    :type session: :class:`sqlalchemt.orm.Session`
+
+    :param question: A question to an answer
+    :type question: :class:`str`
+
+    :param answer: An answer to a question
+    :type answer: :class:`str`
+
+    """
     question = question.strip()
     answer = answer.strip()
 
@@ -85,6 +106,20 @@ def add_document(session, question, answer):
 
 
 def get_best_answer(session, query):
+    """Get best answer to a question.
+
+    :param session: DB session
+    :type session: :class:`sqlalchemt.orm.Session`
+
+    :param query: A question to get an answer
+    :type query: :class:`str`
+
+    :returns: An answer to a question
+    :rtype: :class:`str`
+
+    :raises: :class:`NoAnswerError` when can not found answer to a question
+
+    """
     if not isinstance(query, unicode):
         query = query.decode('utf-8')
 
@@ -117,6 +152,15 @@ def get_best_answer(session, query):
 
 
 def recreate_grams(session):
+    """Re-create grams for database.
+
+    In normal situations, you never need to call this method.
+    But after migrate DB, this method is useful.
+
+    :param session: DB session
+    :type session: :class:`sqlalchemt.orm.Session`
+
+    """
     session.begin()
 
     for document in session.query(Document).all():
@@ -132,6 +176,19 @@ def recreate_grams(session):
 
 
 def recalc_idfs(session, grams=None):
+    """Re-calculate idfs for database.
+
+    calculating idfs for gram is taking long time.
+    So I made it calculates idfs for some grams.
+    If you want make accuracy higher, use this with grams=None.
+
+    :param session: DB session
+    :type session: :class:`sqlalchemt.orm.Session`
+
+    :param grams: grams that you want to re-calculating idfs
+    :type grams: A set of :class:`Gram`
+
+    """
     session.begin(subtransactions=True)
 
     if not grams:
@@ -143,6 +200,12 @@ def recalc_idfs(session, grams=None):
 
 
 def get_count(session):
+    """Get count of :class:`Document`.
+
+    :param session: DB session
+    :type session: :class:`sqlalchemt.orm.Session`
+
+    """
     return session.query(Document).count()
 
 
@@ -213,6 +276,12 @@ def _cosine_measure(v1, v2):
 
 
 class NoAnswerError(Exception):
+    """Raises when autotweet can not found best answer to a question.
+
+    :param msg: A message for the exception
+    :type msg: :class:`str`
+
+    """
 
     def __init__(self, msg):
         self.msg = msg
