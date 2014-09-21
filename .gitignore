@@ -3,6 +3,7 @@
 .tox
 dist
 docs/_build
+build/
 *.egg-info
 MANIFEST
 .*.swp

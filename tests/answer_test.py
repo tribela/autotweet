@@ -1,6 +1,6 @@
-from pytest import fixture
-from autotweet.database import (add_document, get_count, get_session,
-                                get_best_answer)
+from pytest import fixture, raises
+from autotweet.database import (NoAnswerError, add_document, get_count,
+                                get_session, get_best_answer)
 
 
 @fixture
@@ -19,7 +19,8 @@ def test_answers(fx_session):
     assert answer == u'yummy cake'
     answer, ratio = get_best_answer(session, u'scary pie')
     assert answer == u'scary cake'
-    assert not get_best_answer(session, u'blabla')
+    with raises(NoAnswerError):
+        get_best_answer(session, u'blabla')
 
 
 def test_count(fx_session):

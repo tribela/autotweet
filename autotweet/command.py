@@ -1,3 +1,9 @@
+""":mod:`autotweet.command` --- CLI interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This module provides command line interface.
+
+"""
 try:
     import configparser
 except ImportError:

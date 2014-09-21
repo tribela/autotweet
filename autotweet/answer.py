@@ -1,9 +1,16 @@
+""":mod:`autotweet.answer` --- Answering module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This module can auto answering to mentions to you or auto mentioning to others
+tweet.
+
+"""
 import logging
 import re
 import time
 import tweepy
 
-from .database import get_best_answer, get_session
+from .database import NoAnswerError, get_best_answer, get_session
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
 
 MENTION_PATTERN = re.compile(r'(?<=\B@)\w+')
@@ -107,10 +114,10 @@ def polling_timeline(api, db_url, threshold=None):
             question = strip_tweet(status.text)
             mentions = get_mentions(status, friends)
 
-            result = get_best_answer(db_session, question)
-            if not result:
-                return True
-            (answer, ratio) = result
+            try:
+                (answer, ratio) = get_best_answer(db_session, question)
+            except NoAnswerError:
+                pass
 
             if (status.in_reply_to_user_id == me.id) or\
                     (status.user.id != me.id and ratio >= threshold):
