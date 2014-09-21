@@ -1,0 +1,2 @@
+.. automodule:: autotweet.command
+   :members:

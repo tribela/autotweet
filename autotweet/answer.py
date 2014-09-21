@@ -1,3 +1,10 @@
+""":mod:`autotweet.answer` --- Answering module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This module can auto answering to mentions to you or auto mentioning to others
+tweet.
+
+"""
 import logging
 import re
 import time

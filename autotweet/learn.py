@@ -1,3 +1,9 @@
+""":mod:`autotweet.learn` --- Learning your tweets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This module learns your tweets and store it to database.
+
+"""
 import logging
 import time
 import tweepy

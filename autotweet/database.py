@@ -1,3 +1,9 @@
+""":mod:`autotweet.database` --- Database structure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This module provides methods to get session, get answer, etc.
+
+"""
 import logging
 import math
 import random

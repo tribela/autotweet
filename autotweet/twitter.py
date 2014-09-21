@@ -1,3 +1,9 @@
+""":mod:`autotweet.twitter` --- Twitter utilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This module contains Twitter API key and some useful methods.
+
+"""
 import re
 import tweepy
 import webbrowser
