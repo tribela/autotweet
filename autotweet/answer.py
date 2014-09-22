@@ -104,6 +104,8 @@ def polling_timeline(api, db_url, threshold=None):
         else:
             statuses = api.home_timeline(since_id=last_id)
 
+        statuses = filter(lambda x: 'retweeted_status' not in status, statuses)
+
         if statuses:
             statuses.reverse()
             last_id = statuses[-1].id
