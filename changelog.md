@@ -2,6 +2,7 @@
 -----
 
 - Raise `NoAnswerError` when can not found answer.
+- Fix mentioning to retweeted status.
 
 
 0.2
