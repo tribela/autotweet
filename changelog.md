@@ -8,6 +8,7 @@
 -----
 
 - Raise `NoAnswerError` when can not found answer.
+- Documentation.
 
 
 0.2
