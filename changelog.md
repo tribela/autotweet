@@ -1,8 +1,13 @@
+0.2.2
+-----
+
+- Fix mentioning to retweeted status.
+
+
 0.2.1
 -----
 
 - Raise `NoAnswerError` when can not found answer.
-- Fix mentioning to retweeted status.
 
 
 0.2
