@@ -9,18 +9,10 @@ Welcome to autotweet's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-.. automodule:: autotweet
+   autotweet
 
-   .. toctree::
-      :maxdepth: 3
-
-      autotweet/answer
-      autotweet/command
-      autotweet/database
-      autotweet/learn
-      autotweet/twitter
 
 
 
