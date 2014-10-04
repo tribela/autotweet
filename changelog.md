@@ -2,6 +2,7 @@
 -----
 
 - Fix mentioning to retweeted status.
+- Add streaming mode on after_death command.
 
 
 0.2.1
