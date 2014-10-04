@@ -140,6 +140,9 @@ after_death_parser = subparsers.add_parser(
     help='tweet after death.'
     ' When you run this command, you has be replaced by autotweet.')
 after_death_parser.set_defaults(function=after_death_command)
+after_death_parser.add_argument('-s', '--stream',
+                                help='use streaming to collect tweet',
+                                action='store_true', default=False)
 
 add_parser = subparsers.add_parser(
     'add', help='manually add question and answer')
