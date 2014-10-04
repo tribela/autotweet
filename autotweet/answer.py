@@ -55,10 +55,10 @@ class MentionListener(tweepy.streaming.StreamListener):
            time.time() - self.friends_updated > self.friends_timeout:
             self.friends = get_friends(self.api)
             self.friends_updated = time.time()
-        return self.friends
+            return self.friends
 
     def on_status(self, status):
-        if hasattr(status, 'retweeted_status'):
+        if hasattr(status, 'retweeted_status') or status.user.id == self.me.id:
             return True
 
         mentions = get_mentions(status, self.get_friends())
@@ -71,11 +71,10 @@ class MentionListener(tweepy.streaming.StreamListener):
             return True
         (answer, ratio) = result
 
-        if (status.in_reply_to_user_id == self.me.id) or\
-                (status.user.id != self.me.id and ratio >= self.threshold):
+        if status.in_reply_to_user_id == self.me.id or ratio >= self.threshold:
             logger.info(u'@{0.user.screen_name}: {0.text} -> {1}'.format(
                 status, answer
-                ))
+            ))
             try:
                 self.api.update_status(
                     u'{0} {1}'.format(' '.join(mentions), answer),
@@ -104,7 +103,8 @@ def polling_timeline(api, db_url, threshold=None):
         else:
             statuses = api.home_timeline(since_id=last_id)
 
-        statuses = filter(lambda x: not hasattr(x, 'retweeted_status'),
+        statuses = filter(lambda x: not hasattr(x, 'retweeted_status') and
+                          status.user.id != me.id,
                           statuses)
 
         if statuses:
@@ -123,10 +123,10 @@ def polling_timeline(api, db_url, threshold=None):
                 pass
 
             if (status.in_reply_to_user_id == me.id) or\
-                    (status.user.id != me.id and ratio >= threshold):
+               (status.user.id != me.id and ratio >= threshold):
                 logger.info(u'@{0.user.screen_name}: {0.text} -> {1}'.format(
                     status, answer
-                    ))
+                ))
                 try:
                     api.update_status(
                         u'{0} {1}'.format(' '.join(mentions), answer),

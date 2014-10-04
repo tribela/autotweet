@@ -3,6 +3,7 @@
 
 - Fix mentioning to retweeted status.
 - Add streaming mode on after_death command.
+- Filter tweet by myself before get answer.
 
 
 0.2.1
