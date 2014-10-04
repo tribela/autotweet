@@ -81,6 +81,22 @@ You can configure Autotweet by editing ``~/.autotweetrc`` file.
    message1 = If you are reading this, I'm already died.
 
 
+Links
+-----
+
+Package Index (PyPI)
+   https://pypi.python.org/pypi/autotweet/
+
+   .. image:: http://img.shields.io/pypi/v/autotweet.svg
+      :target: https://pypi.python.org/pypi/autotweet/
+
+Docs (ReadTheDocs)
+   https://autotweet.readthedocs.org/
+
+   .. image:: https://readthedocs.org/projects/autotweet/badge/
+      :target: https://autotweet.readthedocs.org/
+
+
 License
 -------
 
