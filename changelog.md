@@ -2,6 +2,7 @@
 -----
 
 - Fix typo on polling timeline in answer module.
+- Raise NoAnswerError when there is no matching grams.
 
 
 0.2.2

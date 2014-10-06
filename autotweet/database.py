@@ -126,6 +126,9 @@ def get_best_answer(session, query):
     session.begin()
 
     grams = _get_grams(session, query)
+    if not grams:
+        raise NoAnswerError('Can not found answer')
+
     documents = set([doc for gram in grams for doc in gram.documents])
 
     recalc_idfs(session, grams)
