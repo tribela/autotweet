@@ -1,3 +1,9 @@
+0.2.3
+-----
+
+- Fix typo on polling timeline in answer module.
+
+
 0.2.2
 -----
 
