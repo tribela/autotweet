@@ -3,6 +3,7 @@
 
 - Fix typo on polling timeline in answer module.
 - Raise NoAnswerError when there is no matching grams.
+- Get mentions when threshold is set.
 
 
 0.2.2

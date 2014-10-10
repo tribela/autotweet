@@ -101,7 +101,12 @@ def polling_timeline(api, db_url, threshold=None):
         if not threshold:
             statuses = api.mentions_timeline(since_id=last_id)
         else:
-            statuses = api.home_timeline(since_id=last_id)
+            home_timeline = api.home_timeline(since_id=last_id)
+            mentions_timeline = api.mentions_timeline(since_id=last_id)
+            home_ids = [status.id for status in home_timeline]
+
+            statuses = home_timeline + [status for status in mentions_timeline
+                                        if status.id not in home_ids]
 
         statuses = filter(lambda x: not hasattr(x, 'retweeted_status') and
                           x.user.id != me.id,
