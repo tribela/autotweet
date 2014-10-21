@@ -66,10 +66,10 @@ class MentionListener(tweepy.streaming.StreamListener):
         question = strip_tweet(status.text)
         status_id = status.id
 
-        result = get_best_answer(self.db_session, question)
-        if not result:
+        try:
+            answer, ratio = get_best_answer(self.db_session, question)
+        except NoAnswerError:
             return True
-        (answer, ratio) = result
 
         if status.in_reply_to_user_id == self.me.id or ratio >= self.threshold:
             logger.info(u'@{0.user.screen_name}: {0.text} -> {1}'.format(
