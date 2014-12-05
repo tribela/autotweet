@@ -9,7 +9,7 @@ import sqlalchemy
 import time
 import tweepy
 from .database import add_document, get_session
-from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
+from .twitter import CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, strip_tweet
 
 MY_CLIENT_NAME = 'learn your tweet'
 logger = logging.getLogger('collector')
@@ -84,8 +84,8 @@ def polling_timeline(api, db_url):
 
 
 def learning_daemon(token, db_url, streaming=False):
-    if not isinstance(token, tweepy.oauth.OAuthToken):
-        token = tweepy.oauth.OAuthToken.from_string(token)
+    if not isinstance(token, OAuthToken):
+        token = OAuthToken.from_string(token)
 
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(token.key, token.secret)

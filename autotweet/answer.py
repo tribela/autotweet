@@ -11,7 +11,7 @@ import time
 import tweepy
 
 from .database import NoAnswerError, get_best_answer, get_session
-from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
+from .twitter import CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, strip_tweet
 
 MENTION_PATTERN = re.compile(r'(?<=\B@)\w+')
 DEFAULT_THRESHOLD = 0.3
@@ -143,8 +143,8 @@ def polling_timeline(api, db_url, threshold=None):
 
 
 def answer_daemon(token, db_url, streaming=False, threshold=None):
-    if not isinstance(token, tweepy.oauth.OAuthToken):
-        token = tweepy.oauth.OAuthToken.from_string(token)
+    if not isinstance(token, OAuthToken):
+        token = OAuthToken.from_string(token)
 
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(token.key, token.secret)
