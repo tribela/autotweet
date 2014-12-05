@@ -46,7 +46,7 @@ class OAuthToken(object):
         })
 
     @staticmethod
-    def from_string(self, string):
+    def from_string(string):
         params = cgi.parse_qs(string, keep_blank_values=False)
         key = params['oauth_token'][0]
         secret = params['oauth_token_secret'][0]
