@@ -17,55 +17,48 @@ from .answer import answer_daemon
 from .database import (add_document, get_session, recalc_idfs,
                        recreate_grams)
 from .learn import learning_daemon
-from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET
+from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
 
 
 logger = logging.getLogger('command')
 
 
-def collector_command(args, config):
+def get_token_string(config_path, key_name):
     try:
-        token = config.get('auth', 'token')
+        token_string = config.get('auth', key_name)
     except configparser.NoOptionError:
-        token = authorize().to_string()
-        config.set('auth', 'token', token)
-        write_config(args, config)
+        token = authorize()
+        token_string = token.to_string()
+        config.set('auth', key_name, token_string)
+        write_config(config_path, config)
 
+    return token_string
+
+
+def collector_command(args, config):
+    token_string = get_token_string(args.config, 'token')
     db_url = config.get('database', 'db_url')
-    token = config.get('auth', 'token')
 
-    learning_daemon(token, db_url, args.stream)
+    learning_daemon(token_string, db_url, args.stream)
 
 
 def answer_command(args, config):
-    try:
-        answerer_token = config.get('auth', 'answerer_token')
-    except configparser.NoOptionError:
-        answerer_token = authorize().to_string()
-        config.set('auth', 'answerer_token', answerer_token)
-        write_config(args, config)
-
+    token_string = get_token_string(args.config, 'answerer_token')
     db_url = config.get('database', 'db_url')
-    token = config.get('auth', 'answerer_token')
     try:
         threshold = config.getfloat('answer', 'threshold')
     except:
         threshold = None
 
-    answer_daemon(token, db_url, args.stream, threshold=threshold)
+    answer_daemon(token_string, db_url, args.stream, threshold=threshold)
 
 
 def after_death_command(args, config):
-    try:
-        my_token = config.get('auth', 'token')
-    except configparser.NoOptionError:
-        my_token = authorize().to_string()
-        config.set('auth', 'token', my_token)
-        write_config(args, config)
+    token_string = get_token_string(args.config, 'token')
 
-    token = tweepy.oauth.OAuthToken.from_string(my_token)
+    token_key, token_secret = OAuthToken.from_string(token_string)
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-    auth.set_access_token(token.key, token.secret)
+    auth.set_access_token(token_key, token_secret)
     api = tweepy.API(auth)
 
     try:
@@ -87,7 +80,7 @@ def after_death_command(args, config):
     except:
         threshold = None
 
-    answer_daemon(my_token, db_url, threshold=threshold)
+    answer_daemon(token_string, db_url, threshold=threshold)
 
 
 def add_command(args, config):
@@ -183,8 +176,7 @@ def set_logging_level(level):
     logging.getLogger('collector').setLevel(log_level)
 
 
-def write_config(args, config):
-    config_path = args.config or os.path.join(os.getenv('HOME'), '.autotweetrc')
+def write_config(config_path, config):
     with open(config_path, 'w') as fp:
         config.write(fp)
 
@@ -196,8 +188,8 @@ def main():
         parser.print_help()
         exit(1)
 
-    config_path = args.config or os.path.join(os.getenv('HOME'), '.autotweetrc')
-    config.read(config_path)
+    args.config = args.config or os.path.join(os.getenv('HOME'), '.autotweetrc')
+    config.read(args.config)
 
     set_logging_level(args.verbose)
 
@@ -207,7 +199,7 @@ def main():
         db_url = raw_input('db url: ').strip()
         config.set('database', 'db_url', db_url)
 
-    write_config(args, config)
+    write_config(args.config, config)
 
     args.function(args, config)
 

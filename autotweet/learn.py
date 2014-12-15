@@ -5,10 +5,11 @@ This module learns your tweets and store it to database.
 
 """
 import logging
+import sqlalchemy
 import time
 import tweepy
 from .database import add_document, get_session
-from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
+from .twitter import CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, strip_tweet
 
 MY_CLIENT_NAME = 'learn your tweet'
 logger = logging.getLogger('collector')
@@ -19,6 +20,7 @@ class MyMentionListener(tweepy.streaming.StreamListener):
     def __init__(self, api, db_url):
         super(MyMentionListener, self).__init__()
         self.api = api
+        self.db_url = db_url
         self.db_session = get_session(db_url)
         self.me = api.me()
 
@@ -35,7 +37,11 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             answer = strip_tweet(status.text, remove_url=False)
 
             if question and answer:
-                add_document(self.db_session, question, answer)
+                try:
+                    add_document(self.db_session, question, answer)
+                except sqlalchemy.exc.OperationalError:
+                    self.db_session = get_session(self.db_url)
+                    add_document(self.db_session, question, answer)
 
         return True
 
@@ -70,12 +76,16 @@ def polling_timeline(api, db_url):
             answer = strip_tweet(status.text, remove_url=False)
 
             if question and answer:
-                add_document(db_session, question, answer)
+                try:
+                    add_document(db_session, question, answer)
+                except sqlalchemy.exc.OperationalError:
+                    db_session = get_session(db_url)
+                    add_document(db_session, question, answer)
 
 
 def learning_daemon(token, db_url, streaming=False):
-    if not isinstance(token, tweepy.oauth.OAuthToken):
-        token = tweepy.oauth.OAuthToken.from_string(token)
+    if not isinstance(token, OAuthToken):
+        token = OAuthToken.from_string(token)
 
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(token.key, token.secret)

@@ -11,7 +11,7 @@ import time
 import tweepy
 
 from .database import NoAnswerError, get_best_answer, get_session
-from .twitter import CONSUMER_KEY, CONSUMER_SECRET, strip_tweet
+from .twitter import CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, strip_tweet
 
 MENTION_PATTERN = re.compile(r'(?<=\B@)\w+')
 DEFAULT_THRESHOLD = 0.3
@@ -66,10 +66,10 @@ class MentionListener(tweepy.streaming.StreamListener):
         question = strip_tweet(status.text)
         status_id = status.id
 
-        result = get_best_answer(self.db_session, question)
-        if not result:
+        try:
+            answer, ratio = get_best_answer(self.db_session, question)
+        except NoAnswerError:
             return True
-        (answer, ratio) = result
 
         if status.in_reply_to_user_id == self.me.id or ratio >= self.threshold:
             logger.info(u'@{0.user.screen_name}: {0.text} -> {1}'.format(
@@ -101,10 +101,15 @@ def polling_timeline(api, db_url, threshold=None):
         if not threshold:
             statuses = api.mentions_timeline(since_id=last_id)
         else:
-            statuses = api.home_timeline(since_id=last_id)
+            home_timeline = api.home_timeline(since_id=last_id)
+            mentions_timeline = api.mentions_timeline(since_id=last_id)
+            home_ids = [status.id for status in home_timeline]
+
+            statuses = home_timeline + [status for status in mentions_timeline
+                                        if status.id not in home_ids]
 
         statuses = filter(lambda x: not hasattr(x, 'retweeted_status') and
-                          status.user.id != me.id,
+                          x.user.id != me.id,
                           statuses)
 
         if statuses:
@@ -138,8 +143,8 @@ def polling_timeline(api, db_url, threshold=None):
 
 
 def answer_daemon(token, db_url, streaming=False, threshold=None):
-    if not isinstance(token, tweepy.oauth.OAuthToken):
-        token = tweepy.oauth.OAuthToken.from_string(token)
+    if not isinstance(token, OAuthToken):
+        token = OAuthToken.from_string(token)
 
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(token.key, token.secret)

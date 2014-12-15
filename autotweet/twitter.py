@@ -4,6 +4,7 @@
 This module contains Twitter API key and some useful methods.
 
 """
+import cgi
 import re
 import tweepy
 import webbrowser
@@ -11,6 +12,10 @@ try:
     from HTMLParser import HTMLParser
 except ImportError:
     from html.parser import HTMLParser
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 
 
 __all__ = ('CONSUMER_KEY', 'CONSUMER_SECRET', 'authorize', 'strip_tweet')
@@ -26,13 +31,35 @@ mention_pattern = re.compile(r'@\w+')
 html_parser = HTMLParser()
 
 
+class OAuthToken(object):
+    key = None
+    secret = None
+
+    def __init__(self, key, secret):
+        self.key = key
+        self.secret = secret
+
+    def to_string(self):
+        return urlencode({
+            'oauth_token': self.key,
+            'oauth_token_secret': self.secret,
+        })
+
+    @staticmethod
+    def from_string(string):
+        params = cgi.parse_qs(string, keep_blank_values=False)
+        key = params['oauth_token'][0]
+        secret = params['oauth_token_secret'][0]
+        return OAuthToken(key, secret)
+
+
 def authorize():
     """Authorize to twitter.
 
     Use PIN authentification.
 
     :returns: Token for authentificate with Twitter.
-    :rtype: :class:`autotweet.oauth.OAuthToken`
+    :rtype: :class:`autotweet.twitter.OAuthToken`
 
     """
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -41,9 +68,9 @@ def authorize():
     webbrowser.open(url)
     pin = raw_input('Input verification number here: ').strip()
 
-    token = auth.get_access_token(verifier=pin)
+    token_key, token_secret = auth.get_access_token(verifier=pin)
 
-    return token
+    return OAuthToken(token_key, token_secret)
 
 
 def strip_tweet(text, remove_url=True):
