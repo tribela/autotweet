@@ -55,7 +55,8 @@ class MentionListener(tweepy.streaming.StreamListener):
            time.time() - self.friends_updated > self.friends_timeout:
             self.friends = get_friends(self.api)
             self.friends_updated = time.time()
-            return self.friends
+
+        return self.friends
 
     def on_status(self, status):
         if hasattr(status, 'retweeted_status') or status.user.id == self.me.id:
