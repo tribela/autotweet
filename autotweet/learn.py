@@ -5,6 +5,7 @@ This module learns your tweets and store it to database.
 
 """
 import logging
+import re
 import sqlalchemy
 import time
 import tweepy
@@ -12,7 +13,19 @@ from .database import add_document, get_session
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, strip_tweet
 
 MY_CLIENT_NAME = 'learn your tweet'
+IGNORE_PATTERN = re.compile(r'@\w+\s{2,}')
 logger = logging.getLogger('collector')
+
+
+def check_ignore(status):
+    if hasattr(status, 'retweeted_status'):
+        return True
+    if status.source == MY_CLIENT_NAME:
+        return True
+    if IGNORE_PATTERN.match(status.text):
+        return True
+
+    return False
 
 
 class MyMentionListener(tweepy.streaming.StreamListener):
@@ -25,12 +38,10 @@ class MyMentionListener(tweepy.streaming.StreamListener):
         self.me = api.me()
 
     def on_status(self, status):
-        if hasattr(status, 'retweeted_status'):
+        if check_ignore(status):
             return True
 
         if status.user.id == self.me.id and status.in_reply_to_status_id:
-            if status.source == MY_CLIENT_NAME:
-                return True
             original_status = self.api.get_status(status.in_reply_to_status_id)
 
             question = strip_tweet(original_status.text)
@@ -63,9 +74,7 @@ def polling_timeline(api, db_url):
             continue
 
         for status in statuses:
-            if status.source == MY_CLIENT_NAME:
-                continue
-            if hasattr(status, 'retweeted_status'):
+            if check_ignore(status):
                 continue
             if not status.in_reply_to_status_id:
                 continue

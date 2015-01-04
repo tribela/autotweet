@@ -1,3 +1,9 @@
+0.3.0
+-----
+
+- Ignoring tweet like "@id  Hello" (2 or more spaces between mention and msg).
+
+
 0.2.3
 -----
 
