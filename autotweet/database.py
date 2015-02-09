@@ -41,7 +41,6 @@ class Document(Base):
     grams = relationship(
         'Gram', secondary=association_table, backref='documents')
 
-
     def __init__(self, text, answer):
         self.text = text
         self.answer = answer
