@@ -13,7 +13,7 @@ from .database import add_document, get_session
 from .twitter import CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, strip_tweet
 
 MY_CLIENT_NAME = 'learn your tweet'
-IGNORE_PATTERN = re.compile(r'@\w+\s{2,}')
+IGNORE_PATTERN = re.compile(r'(@\w+\s+)*@\w+\s{2,}')
 logger = logging.getLogger('collector')
 
 
