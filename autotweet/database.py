@@ -8,7 +8,7 @@ import logging
 import math
 import random
 from sqlalchemy import (Column, Float,  ForeignKey, Integer, String, Table,
-                        create_engine)
+                        UniqueConstraint, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 
@@ -37,6 +37,8 @@ class Document(Base):
     answer = Column(String(140), nullable=False)
     grams = relationship(
         'Gram', secondary=association_table, backref='documents')
+
+    __table_args__ = (UniqueConstraint('text', 'answer'),)
 
     def __init__(self, text, answer):
         self.text = text
