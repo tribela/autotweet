@@ -13,8 +13,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 
 
-__all__ = ('Document', 'Gram', 'NoAnswerError', 'get_count', 'get_session',
-           'add_document', 'get_best_answer', 'recreate_grams', 'recalc_idfs')
+__all__ = ('Base', 'Document', 'Gram', 'NoAnswerError', 'get_count',
+           'get_session', 'add_document', 'get_best_answer', 'recreate_grams',
+           'recalc_idfs')
 
 
 Base = declarative_base()
@@ -96,8 +97,6 @@ def add_document(session, question, answer):
         return
     logger.info(u'add document: {0} -> {1}'.format(question, answer))
 
-    session.begin()
-
     grams = _get_grams(session, question, make=True)
 
     doc = Document(question, answer)
@@ -125,8 +124,6 @@ def get_best_answer(session, query):
     """
     if not isinstance(query, unicode):
         query = query.decode('utf-8')
-
-    session.begin()
 
     grams = _get_grams(session, query)
     if not grams:
@@ -167,7 +164,6 @@ def recreate_grams(session):
     :type session: :class:`sqlalchemt.orm.Session`
 
     """
-    session.begin()
 
     for document in session.query(Document).all():
         grams = _get_grams(session, document.text, make=True)
