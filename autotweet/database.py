@@ -10,11 +10,12 @@ import random
 from sqlalchemy import (Column, Float,  ForeignKey, Integer, String, Table,
                         UniqueConstraint, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, scoped_session, sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker
 
 
-__all__ = ('Document', 'Gram', 'NoAnswerError', 'get_count', 'get_session',
-           'add_document', 'get_best_answer', 'recreate_grams', 'recalc_idfs')
+__all__ = ('Base', 'Document', 'Gram', 'NoAnswerError', 'get_count',
+           'get_session', 'add_document', 'get_best_answer', 'recreate_grams',
+           'recalc_idfs')
 
 
 Base = declarative_base()
@@ -32,6 +33,9 @@ association_table = Table(
 
 class Document(Base):
     __tablename__ = 'documents'
+    __table_args__ = (
+        UniqueConstraint('text', 'answer'),
+    )
     id = Column(Integer, primary_key=True)
     text = Column(String(140), nullable=False)
     answer = Column(String(140), nullable=False)
@@ -66,10 +70,8 @@ def get_session(url):
 
     """
     engine = create_engine(url)
-    db_session = scoped_session(
-        sessionmaker(engine, autoflush=True, autocommit=True))
+    db_session = sessionmaker(engine)()
     Base.metadata.create_all(engine)
-    Base.query = db_session.query_property()
     return db_session
 
 
@@ -94,8 +96,6 @@ def add_document(session, question, answer):
         logger.info(u'Already here: {0} -> {1}'.format(question, answer))
         return
     logger.info(u'add document: {0} -> {1}'.format(question, answer))
-
-    session.begin()
 
     grams = _get_grams(session, question, make=True)
 
@@ -124,8 +124,6 @@ def get_best_answer(session, query):
     """
     if not isinstance(query, unicode):
         query = query.decode('utf-8')
-
-    session.begin()
 
     grams = _get_grams(session, query)
     if not grams:
@@ -166,7 +164,6 @@ def recreate_grams(session):
     :type session: :class:`sqlalchemt.orm.Session`
 
     """
-    session.begin()
 
     for document in session.query(Document).all():
         grams = _get_grams(session, document.text, make=True)

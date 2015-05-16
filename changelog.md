@@ -8,6 +8,8 @@
 -----
 
 - Fix operand error.
+- add `Base` to `__all__`
+- Remove unneeded session.begin
 
 
 0.2.3
