@@ -10,7 +10,7 @@ import random
 from sqlalchemy import (Column, Float,  ForeignKey, Integer, String, Table,
                         UniqueConstraint, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, scoped_session, sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker
 
 
 __all__ = ('Base', 'Document', 'Gram', 'NoAnswerError', 'get_count',
@@ -68,10 +68,8 @@ def get_session(url):
 
     """
     engine = create_engine(url)
-    db_session = scoped_session(
-        sessionmaker(engine, autoflush=True, autocommit=True))
+    db_session = sessionmaker(engine)()
     Base.metadata.create_all(engine)
-    Base.query = db_session.query_property()
     return db_session
 
 
