@@ -2,6 +2,7 @@
 -----
 
 - Ignoring tweet like "@id  Hello" (2 or more spaces between mention and msg).
+- Import from your last tweets with `import` command.
 
 
 0.2.4

@@ -92,6 +92,35 @@ def polling_timeline(api, db_url):
                     add_document(db_session, question, answer)
 
 
+def import_timeline(token, db_url, count):
+    if not isinstance(token, OAuthToken):
+        token = OAuthToken.from_string(token)
+
+    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    auth.set_access_token(token.key, token.secret)
+    api = tweepy.API(auth)
+
+    db_session = get_session(db_url)
+    me = api.me()
+
+    statuses = me.timeline(count=count)
+    statuses.reverse()
+
+    for status in statuses:
+        if check_ignore(status):
+            continue
+        if not status.in_reply_to_status_id:
+            continue
+
+        original_status = api.get_status(status.in_reply_to_status_id)
+
+        question = strip_tweet(original_status.text)
+        answer = strip_tweet(status.text, remove_url=False)
+
+        if question and answer:
+            add_document(db_session, question, answer)
+
+
 def learning_daemon(token, db_url, streaming=False):
     if not isinstance(token, OAuthToken):
         token = OAuthToken.from_string(token)

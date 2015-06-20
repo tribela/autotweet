@@ -16,7 +16,7 @@ import tweepy
 from .answer import answer_daemon
 from .database import (add_document, get_session, recalc_idfs,
                        recreate_grams)
-from .learn import learning_daemon
+from .learn import import_timeline, learning_daemon
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
 
 
@@ -93,6 +93,13 @@ def add_command(args, config):
     add_document(session, question, answer)
 
 
+def import_command(args, config):
+    token_string = get_token_string(args.config, 'token')
+    db_url = config.get('database', 'db_url')
+
+    import_timeline(token_string, db_url, args.count)
+
+
 def recalc_command(args, config):
     db_url = config.get('database', 'db_url')
     session = get_session(db_url)
@@ -142,6 +149,13 @@ add_parser = subparsers.add_parser(
 add_parser.set_defaults(function=add_command)
 add_parser.add_argument('question', help='Question to add')
 add_parser.add_argument('answer', help='Answer to add')
+
+import_parser = subparsers.add_parser(
+    'import', help='Import from your last statuses')
+import_parser.set_defaults(function=import_command)
+import_parser.add_argument('-c', '--count',
+                           help='Count for import last statuses',
+                           type=int, default=1000)
 
 recalc_parser = subparsers.add_parser(
     'recalc', help='re-calculate idf for all grams')
