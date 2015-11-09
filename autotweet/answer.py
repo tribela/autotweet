@@ -78,8 +78,8 @@ class MentionListener(tweepy.streaming.StreamListener):
             ))
             try:
                 self.api.update_status(
-                    u'{0} {1}'.format(' '.join(mentions), answer),
-                    status_id)
+                    status=u'{0} {1}'.format(' '.join(mentions), answer),
+                    in_reply_to_status_id=status_id)
             except tweepy.error.TweepError as e:
                 logger.error(u'Failed to update status: {0}'.format(
                     e.message
@@ -135,8 +135,8 @@ def polling_timeline(api, db_url, threshold=None):
                 ))
                 try:
                     api.update_status(
-                        u'{0} {1}'.format(' '.join(mentions), answer),
-                        status.id)
+                        status=u'{0} {1}'.format(' '.join(mentions), answer),
+                        in_reply_to_status_id=status.id)
                 except tweepy.error.TweepError as e:
                     logger.error(u'Failed to update status: {0}'.format(
                         e.message
