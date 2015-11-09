@@ -112,7 +112,10 @@ def import_timeline(token, db_url, count):
         if not status.in_reply_to_status_id:
             continue
 
-        original_status = api.get_status(status.in_reply_to_status_id)
+        try:
+            original_status = api.get_status(status.in_reply_to_status_id)
+        except:
+            continue
 
         question = strip_tweet(original_status.text)
         answer = strip_tweet(status.text, remove_url=False)
