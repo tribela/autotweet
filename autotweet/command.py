@@ -68,7 +68,7 @@ def after_death_command(args, config):
 
     for key, item in auto_tweets:
         try:
-            api.update_status(item)
+            api.update_status(status=item)
             logger.info(u'Tweet item: {0}'.format(item))
         except tweepy.error.TweepError as e:
             logger.error(u'Failed to update status: {0}'.format(e.message))
