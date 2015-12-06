@@ -10,7 +10,8 @@ import sqlalchemy
 import time
 import tweepy
 from .database import add_document, get_session
-from .twitter import CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, strip_tweet
+from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, expand_url,
+                      strip_tweet)
 
 MY_CLIENT_NAME = 'learn your tweet'
 IGNORE_PATTERN = re.compile(r'(@\w+\s+)*@\w+\s{2,}|^[^@]')
@@ -45,7 +46,7 @@ class MyMentionListener(tweepy.streaming.StreamListener):
             original_status = self.api.get_status(status.in_reply_to_status_id)
 
             question = strip_tweet(original_status.text)
-            answer = strip_tweet(status.text, remove_url=False)
+            answer = strip_tweet(expand_url(status.text), remove_url=False)
 
             if question and answer:
                 try:

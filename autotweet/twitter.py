@@ -73,6 +73,22 @@ def authorize():
     return OAuthToken(token_key, token_secret)
 
 
+def expand_url(status):
+    """Expand url on statuses.
+
+    :param status: A tweepy status to expand urls.
+    :type status: :class:`tweepy.models.Status`
+    :returns: A string with expanded urls.
+    :rtype: :class:`str`
+    """
+
+    txt = status.text
+    for url in status.entities['urls']:
+        txt = txt.replace(url['url'], url['display_url'])
+
+    return txt
+
+
 def strip_tweet(text, remove_url=True):
     """Strip tweet message.
 

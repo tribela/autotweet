@@ -3,6 +3,7 @@
 
 - Ignoring tweet like "@id  Hello" (2 or more spaces between mention and msg).
 - Import from your last tweets with `import` command.
+- Expand urls on your answer.
 
 
 0.2.4
