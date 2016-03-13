@@ -122,6 +122,8 @@ def get_best_answer(session, query):
     :raises: :class:`NoAnswerError` when can not found answer to a question
 
     """
+    if isinstance(query, buffer):
+        query = str(query)
     if not isinstance(query, unicode):
         query = query.decode('utf-8')
 
@@ -242,6 +244,8 @@ def _get_tf(gram, document):
     if isinstance(gram, Gram):
         gram = gram.gram
 
+    if isinstance(gram, buffer):
+        gram = str(gram)
     if not isinstance(gram, unicode):
         gram = gram.decode('utf-8')
 
