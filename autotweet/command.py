@@ -14,8 +14,7 @@ import os
 import tweepy
 
 from .daemons import answer_daemon, import_timeline, learning_daemon
-from .database import get_session
-from .learning import add_document, recalc_idfs, recreate_grams
+from .learning import DataCollection
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
 
 
@@ -87,9 +86,9 @@ def add_command(args, config):
     question = args.question.decode('utf-8')
     answer = args.answer.decode('utf-8')
 
-    session = get_session(db_url)
+    data_collection = DataCollection(db_url)
 
-    add_document(session, question, answer)
+    data_collection.add_document(question, answer)
 
 
 def import_command(args, config):
@@ -101,14 +100,14 @@ def import_command(args, config):
 
 def recalc_command(args, config):
     db_url = config.get('database', 'db_url')
-    session = get_session(db_url)
-    recalc_idfs(session)
+    data_collection = DataCollection(db_url)
+    data_collection.recalc_idfs()
 
 
 def recreate_command(args, config):
     db_url = config.get('database', 'db_url')
-    session = get_session(db_url)
-    recreate_grams(session)
+    data_collection = DataCollection(db_url)
+    data_collection.recreate_grams()
 
 
 parser = argparse.ArgumentParser(prog='autotweet')

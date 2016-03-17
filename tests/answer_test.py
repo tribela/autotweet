@@ -1,47 +1,45 @@
 from pytest import fixture, raises
-from autotweet.database import (NoAnswerError, add_document, get_count,
-                                get_session, get_best_answer)
+from autotweet.learning import DataCollection, NoAnswerError
 
 
 @fixture
-def fx_session():
+def fx_data_collection():
     db_url = 'sqlite:///:memory:'
+    return DataCollection(db_url)
 
-    return get_session(db_url)
 
+def test_answers(fx_data_collection):
+    dc = fx_data_collection
+    dc.add_document(u'I like yummy cake', u'yummy cake')
+    dc.add_document(u'I like scary cake', u'scary cake')
 
-def test_answers(fx_session):
-    session = fx_session
-    add_document(session, u'I like yummy cake', u'yummy cake')
-    add_document(session, u'I like scary cake', u'scary cake')
-
-    answer, ratio = get_best_answer(session, u'yummy pie')
+    answer, ratio = dc.get_best_answer(u'yummy pie')
     assert answer == u'yummy cake'
-    answer, ratio = get_best_answer(session, u'scary pie')
+    answer, ratio = dc.get_best_answer(u'scary pie')
     assert answer == u'scary cake'
     with raises(NoAnswerError):
-        get_best_answer(session, u'blabla')
+        dc.get_best_answer(u'blabla')
 
 
-def test_count(fx_session):
-    session = fx_session
-    assert get_count(session) == 0
+def test_count(fx_data_collection):
+    dc = fx_data_collection
+    assert dc.get_count() == 0
 
-    add_document(session, u'this is an apple.', u'I like apple.')
-    assert get_count(session) == 1
-    add_document(session, u'this is an apple.', u'I like apple.')
-    assert get_count(session) == 1
+    dc.add_document(u'this is an apple.', u'I like apple.')
+    assert dc.get_count() == 1
+    dc.add_document(u'this is an apple.', u'I like apple.')
+    assert dc.get_count() == 1
 
 
-def test_short_question(fx_session):
-    session = fx_session
-    assert get_count(session) == 0
+def test_short_question(fx_data_collection):
+    dc = fx_data_collection
+    assert dc.get_count() == 0
 
-    add_document(session, u'c', u'cake')
-    add_document(session, u'l', u'lie')
+    dc.add_document(u'c', u'cake')
+    dc.add_document(u'l', u'lie')
 
-    answer, ratio = get_best_answer(session, u'c')
+    answer, ratio = dc.get_best_answer(u'c')
     assert answer == u'cake'
 
-    answer, ratio = get_best_answer(session, u'l')
+    answer, ratio = dc.get_best_answer(u'l')
     assert answer == u'lie'

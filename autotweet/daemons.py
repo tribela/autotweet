@@ -9,10 +9,7 @@ import re
 import time
 import tweepy
 
-from sqlalchemy.exc import OperationalError
-
-from .database import get_session
-from .learning import NoAnswerError, add_document, get_best_answer
+from .learning import NoAnswerError, DataCollection
 from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, expand_url,
                       strip_tweet)
 
@@ -42,8 +39,7 @@ class CollectorMentionListener(tweepy.streaming.StreamListener):
     def __init__(self, api, db_url):
         super(CollectorMentionListener, self).__init__()
         self.api = api
-        self.db_url = db_url
-        self.db_session = get_session(db_url)
+        self.data_collection = DataCollection(db_url)
         self.me = api.me()
 
     def on_status(self, status):
@@ -57,17 +53,13 @@ class CollectorMentionListener(tweepy.streaming.StreamListener):
             answer = strip_tweet(expand_url(status.text), remove_url=False)
 
             if question and answer:
-                try:
-                    add_document(self.db_session, question, answer)
-                except OperationalError:
-                    self.db_session = get_session(self.db_url)
-                    add_document(self.db_session, question, answer)
+                self.data_collection.add_document(question, answer)
 
         return True
 
 
 def collector_polling_timeline(api, db_url):
-    db_session = get_session(db_url)
+    data_collection = DataCollection(db_url)
     me = api.me()
     last_id = me.status.id
 
@@ -94,11 +86,7 @@ def collector_polling_timeline(api, db_url):
             answer = strip_tweet(status.text, remove_url=False)
 
             if question and answer:
-                try:
-                    add_document(db_session, question, answer)
-                except OperationalError:
-                    db_session = get_session(db_url)
-                    add_document(db_session, question, answer)
+                data_collection.add_document(question, answer)
 
 
 def import_timeline(token, db_url, count):
@@ -109,7 +97,7 @@ def import_timeline(token, db_url, count):
     auth.set_access_token(token.key, token.secret)
     api = tweepy.API(auth)
 
-    db_session = get_session(db_url)
+    data_collection = DataCollection(db_url)
     me = api.me()
 
     statuses = me.timeline(count=count)
@@ -130,7 +118,7 @@ def import_timeline(token, db_url, count):
         answer = strip_tweet(status.text, remove_url=False)
 
         if question and answer:
-            add_document(db_session, question, answer)
+            data_collection.add_document(question, answer)
 
 
 def learning_daemon(token, db_url, streaming=False):
@@ -178,7 +166,7 @@ class AnswerMentionListener(tweepy.streaming.StreamListener):
     def __init__(self, api, db_url, threshold=None):
         super(AnswerMentionListener, self).__init__()
         self.api = api
-        self.db_session = get_session(db_url)
+        self.data_collection = DataCollection(db_url)
         self.me = api.me()
 
         if threshold:
@@ -202,7 +190,7 @@ class AnswerMentionListener(tweepy.streaming.StreamListener):
         status_id = status.id
 
         try:
-            answer, ratio = get_best_answer(self.db_session, question)
+            answer, ratio = self.data_collection.get_best_answer(question)
         except NoAnswerError:
             return True
 
@@ -221,7 +209,7 @@ class AnswerMentionListener(tweepy.streaming.StreamListener):
 
 
 def answer_polling_timeline(api, db_url, threshold=None):
-    db_session = get_session(db_url)
+    data_collection = DataCollection(db_url)
     me = api.me()
     threshold = threshold or DEFAULT_THRESHOLD
 
@@ -258,7 +246,7 @@ def answer_polling_timeline(api, db_url, threshold=None):
             mentions = get_mentions(status, friends)
 
             try:
-                (answer, ratio) = get_best_answer(db_session, question)
+                (answer, ratio) = data_collection.get_best_answer(question)
             except NoAnswerError:
                 pass
 
