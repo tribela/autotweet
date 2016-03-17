@@ -13,10 +13,9 @@ import logging
 import os
 import tweepy
 
-from .answer import answer_daemon
+from .daemons import answer_daemon, import_timeline, learning_daemon
 from .database import (add_document, get_session, recalc_idfs,
                        recreate_grams)
-from .learn import import_timeline, learning_daemon
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
 
 
