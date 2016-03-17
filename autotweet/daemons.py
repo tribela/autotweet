@@ -11,7 +11,8 @@ import tweepy
 
 from sqlalchemy.exc import OperationalError
 
-from .database import NoAnswerError, add_document, get_best_answer, get_session
+from .database import get_session
+from .learning import NoAnswerError, add_document, get_best_answer
 from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, expand_url,
                       strip_tweet)
 

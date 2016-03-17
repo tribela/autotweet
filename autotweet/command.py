@@ -14,8 +14,8 @@ import os
 import tweepy
 
 from .daemons import answer_daemon, import_timeline, learning_daemon
-from .database import (add_document, get_session, recalc_idfs,
-                       recreate_grams)
+from .database import get_session
+from .learning import add_document, recalc_idfs, recreate_grams
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
 
 
