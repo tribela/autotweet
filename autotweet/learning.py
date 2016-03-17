@@ -38,7 +38,7 @@ class DataCollection(object):
 
         doc = Document(question, answer)
         doc.grams = list(grams)
-        self.recalc_idfs(grams)
+        self._recalc_idfs(grams)
 
         self.session.add(doc)
         self.session.commit()
@@ -67,7 +67,7 @@ class DataCollection(object):
 
         documents = set([doc for gram in grams for doc in gram.documents])
 
-        self.recalc_idfs(grams)
+        self._recalc_idfs(grams)
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
@@ -115,6 +115,10 @@ class DataCollection(object):
         self.session.remove()
 
     def recalc_idfs(self, grams=None):
+        self._recalc_idfs(grams)
+        self.session.remove()
+
+    def _recalc_idfs(self, grams=None):
         """Re-calculate idfs for database.
 
         calculating idfs for gram is taking long time.
