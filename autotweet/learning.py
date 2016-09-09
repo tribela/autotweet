@@ -42,7 +42,7 @@ class DataCollection(object):
 
         self.session.add(doc)
         self.session.commit()
-        self.session.remove()
+        self.session.close()
 
     def get_best_answer(self, query):
         """Get best answer to a question.
@@ -89,7 +89,7 @@ class DataCollection(object):
         except ValueError:
             raise NoAnswerError('Can not found answer')
         finally:
-            self.session.remove()
+            self.session.close()
 
     def recreate_grams(self):
         """Re-create grams for database.
@@ -112,7 +112,7 @@ class DataCollection(object):
             self.session.delete(gram)
 
         self.session.commit()
-        self.session.remove()
+        self.session.close()
 
     def recalc_idfs(self, grams=None):
         """Re-calculate idfs for database.
