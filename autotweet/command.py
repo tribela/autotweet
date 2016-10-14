@@ -4,6 +4,7 @@
 This module provides command line interface.
 
 """
+from __future__ import unicode_literals
 try:
     import configparser
 except ImportError:
@@ -67,9 +68,9 @@ def after_death_command(args, config):
     for key, item in auto_tweets:
         try:
             api.update_status(status=item)
-            logger.info(u'Tweet item: {0}'.format(item))
+            logger.info('Tweet item: {0}'.format(item))
         except tweepy.error.TweepError as e:
-            logger.error(u'Failed to update status: {0}'.format(e.message))
+            logger.error('Failed to update status: {0}'.format(e.message))
 
     db_url = config.get('database', 'db_url')
 

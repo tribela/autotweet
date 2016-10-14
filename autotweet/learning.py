@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import logging
 import math
 import random
@@ -30,9 +31,9 @@ class DataCollection(object):
 
         if self.session.query(Document) \
                 .filter_by(text=question, answer=answer).count():
-            logger.info(u'Already here: {0} -> {1}'.format(question, answer))
+            logger.info('Already here: {0} -> {1}'.format(question, answer))
             return
-        logger.info(u'add document: {0} -> {1}'.format(question, answer))
+        logger.info('add document: {0} -> {1}'.format(question, answer))
 
         grams = self._get_grams(question, make=True)
 
@@ -84,7 +85,7 @@ class DataCollection(object):
                        if docs.get(answer) == max_ratio]
 
             answer = random.choice(answers)
-            logger.debug(u'{0} -> {1} ({2})'.format(query, answer, max_ratio))
+            logger.debug('{0} -> {1} ({2})'.format(query, answer, max_ratio))
             return (answer, max_ratio)
         except ValueError:
             raise NoAnswerError('Can not found answer')

@@ -4,6 +4,7 @@
 This module learns your tweets and answering it automatically.
 
 """
+from __future__ import unicode_literals
 import logging
 import re
 import time
@@ -195,15 +196,15 @@ class AnswerMentionListener(tweepy.streaming.StreamListener):
             return True
 
         if status.in_reply_to_user_id == self.me.id or ratio >= self.threshold:
-            answer_logger.info(u'@{0.user.screen_name}: {0.text} -> {1}'.format(
+            answer_logger.info('@{0.user.screen_name}: {0.text} -> {1}'.format(
                 status, answer
             ))
             try:
                 self.api.update_status(
-                    status=u'{0} {1}'.format(' '.join(mentions), answer),
+                    status='{0} {1}'.format(' '.join(mentions), answer),
                     in_reply_to_status_id=status_id)
             except tweepy.error.TweepError as e:
-                answer_logger.error(u'Failed to update status: {0}'.format(
+                answer_logger.error('Failed to update status: {0}'.format(
                     e.message
                 ))
 
@@ -253,15 +254,15 @@ def answer_polling_timeline(api, db_url, threshold=None):
             if (status.in_reply_to_user_id == me.id) or \
                     (status.user.id != me.id and ratio >= threshold):
                 answer_logger.info(
-                    u'@{0.user.screen_name}: {0.text} -> {1}'.format(
+                    '@{0.user.screen_name}: {0.text} -> {1}'.format(
                         status, answer
                     ))
                 try:
                     api.update_status(
-                        status=u'{0} {1}'.format(' '.join(mentions), answer),
+                        status='{0} {1}'.format(' '.join(mentions), answer),
                         in_reply_to_status_id=status.id)
                 except tweepy.error.TweepError as e:
-                    answer_logger.error(u'Failed to update status: {0}'.format(
+                    answer_logger.error('Failed to update status: {0}'.format(
                         e.message
                     ))
 

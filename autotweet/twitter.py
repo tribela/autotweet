@@ -4,6 +4,7 @@
 This module contains Twitter API key and some useful methods.
 
 """
+from __future__ import unicode_literals
 import cgi
 import re
 import tweepy

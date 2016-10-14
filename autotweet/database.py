@@ -4,6 +4,7 @@
 This module provides methods to get session, get answer, etc.
 
 """
+from __future__ import unicode_literals
 import logging
 from sqlalchemy import (Column, Float,  ForeignKey, Integer, String, Table,
                         UniqueConstraint, create_engine)
