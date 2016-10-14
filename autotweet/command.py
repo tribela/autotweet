@@ -92,6 +92,15 @@ def add_command(args, config):
     data_collection.add_document(question, answer)
 
 
+def get_command(args, config):
+    db_url = config.get('database', 'db_url')
+    question = args.question.decode('utf-8')
+
+    data_collection = DataCollection(db_url)
+    answer, ratio = data_collection.get_best_answer(question)
+    print('{} (ratio: {})'.format(answer, ratio))
+
+
 def import_command(args, config):
     token_string = get_token_string(args.config, 'token')
     db_url = config.get('database', 'db_url')
@@ -148,6 +157,11 @@ add_parser = subparsers.add_parser(
 add_parser.set_defaults(function=add_command)
 add_parser.add_argument('question', help='Question to add')
 add_parser.add_argument('answer', help='Answer to add')
+
+get_parser = subparsers.add_parser(
+     'get', help='Get best answer from CLI')
+get_parser.set_defaults(function=get_command)
+get_parser.add_argument('question', help='Question to answer')
 
 import_parser = subparsers.add_parser(
     'import', help='Import from your last statuses')

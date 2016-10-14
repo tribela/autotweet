@@ -1,3 +1,9 @@
+0.3.1
+-----
+
+- New subcommand `get` added.
+
+
 0.3.0
 -----
 
