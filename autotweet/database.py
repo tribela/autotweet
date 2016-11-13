@@ -5,11 +5,13 @@ This module provides methods to get session, get answer, etc.
 
 """
 from __future__ import unicode_literals
-import logging
 from sqlalchemy import (Column, Float,  ForeignKey, Integer, String, Table,
                         UniqueConstraint, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
+
+from .logger_factory import get_logger
+
 
 
 __all__ = ('Base', 'Document', 'Gram', 'get_session')
@@ -17,7 +19,7 @@ __all__ = ('Base', 'Document', 'Gram', 'get_session')
 Base = declarative_base()
 GRAM_LENGTH = 2
 
-logger = logging.getLogger('database')
+logger = get_logger('database')
 
 
 def get_session(url):

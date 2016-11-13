@@ -5,11 +5,11 @@ This module learns your tweets and answering it automatically.
 
 """
 from __future__ import unicode_literals
-import logging
 import re
 import time
 import tweepy
 
+from .logger_factory import get_logger
 from .learning import NoAnswerError, DataCollection
 from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, expand_url,
                       strip_tweet)
@@ -17,11 +17,11 @@ from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, expand_url,
 
 MY_CLIENT_NAME = 'learn your tweet'
 IGNORE_PATTERN = re.compile(r'(@\w+\s+)*@\w+\s{2,}|^[^@]')
-collector_logger = logging.getLogger('collector')
+collector_logger = get_logger('collector')
 
 MENTION_PATTERN = re.compile(r'(?<=\B@)\w+')
 DEFAULT_THRESHOLD = 0.3
-answer_logger = logging.getLogger('answer')
+answer_logger = get_logger('answer')
 
 
 def check_ignore(status):

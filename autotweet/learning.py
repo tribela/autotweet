@@ -1,14 +1,13 @@
 from __future__ import unicode_literals
-import logging
 import math
 import random
 
 from .database import GRAM_LENGTH, Document, Gram, get_session
-
+from .logger_factory import get_logger
 
 __all__ = ('NoAnswerError', 'DataCollection')
 
-logger = logging.getLogger('learning')
+logger = get_logger('learning')
 
 
 class DataCollection(object):

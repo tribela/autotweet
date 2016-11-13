@@ -14,12 +14,13 @@ import logging
 import os
 import tweepy
 
+from . import logger_factory
 from .daemons import answer_daemon, import_timeline, learning_daemon
 from .learning import DataCollection
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
 
 
-logger = logging.getLogger('command')
+logger = logger_factory.get_logger('command')
 
 
 def get_token_string(config_path, key_name):
@@ -194,14 +195,7 @@ def set_logging_level(level):
     else:
         log_level = logging.DEBUG
 
-    logging.basicConfig(
-        format='%(asctime)s {%(module)s:%(levelname)s}: %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S')
-    logging.getLogger('database').setLevel(log_level)
-    logging.getLogger('answer').setLevel(log_level)
-    logging.getLogger('command').setLevel(log_level)
-    logging.getLogger('collector').setLevel(log_level)
-    logging.getLogger('learning').setLevel(log_level)
+    logger_factory.set_level(log_level)
 
 
 def write_config(config_path, config):
