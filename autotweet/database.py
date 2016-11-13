@@ -13,7 +13,6 @@ from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 from .logger_factory import get_logger
 
 
-
 __all__ = ('Base', 'Document', 'Gram', 'get_session')
 
 Base = declarative_base()
