@@ -2,6 +2,7 @@
 -----
 
 - Fix logger for `learning`.
+- Support python 3.5.
 
 
 0.3.1

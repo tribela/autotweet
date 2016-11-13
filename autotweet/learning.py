@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import math
 import random
+import sys
 
 from .database import GRAM_LENGTH, Document, Gram, get_session
 from .logger_factory import get_logger
@@ -8,6 +9,18 @@ from .logger_factory import get_logger
 __all__ = ('NoAnswerError', 'DataCollection')
 
 logger = get_logger('learning')
+
+
+def make_unicode(string):
+    if sys.version_info >= (3,):
+        return str(string)
+    else:
+        if isinstance(string, buffer):
+            string = str(string)
+        if not isinstance(string, unicode):
+            string = string.decode('utf-8')
+
+        return string
 
 
 class DataCollection(object):
@@ -56,10 +69,7 @@ class DataCollection(object):
         :raises: :class:`NoAnswerError` when can not found answer to a question
 
         """
-        if isinstance(query, buffer):
-            query = str(query)
-        if not isinstance(query, unicode):
-            query = query.decode('utf-8')
+        query = make_unicode(query)
 
         grams = self._get_grams(query)
         if not grams:
@@ -179,10 +189,7 @@ class DataCollection(object):
         if isinstance(gram, Gram):
             gram = gram.gram
 
-        if isinstance(gram, buffer):
-            gram = str(gram)
-        if not isinstance(gram, unicode):
-            gram = gram.decode('utf-8')
+        gram = make_unicode(gram)
 
         return document.text.count(gram) + document.answer.count(gram)
 
