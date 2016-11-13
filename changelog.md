@@ -1,3 +1,9 @@
+0.3.2
+-----
+
+- Fix logger for `learning`.
+
+
 0.3.1
 -----
 

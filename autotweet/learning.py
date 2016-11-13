@@ -104,6 +104,7 @@ class DataCollection(object):
         """
 
         for document in self.session.query(Document).all():
+            logger.info(document.text)
             grams = self._get_grams(document.text, make=True)
             document.grams = list(grams)
 
