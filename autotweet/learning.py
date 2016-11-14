@@ -26,7 +26,7 @@ def make_unicode(string):
 class DataCollection(object):
 
     def __init__(self, db_url):
-        self.session = get_session(db_url)
+        self.Session = get_session(db_url)
 
     def add_document(self, question, answer):
         """Add question answer set to DB.
@@ -41,21 +41,22 @@ class DataCollection(object):
         question = question.strip()
         answer = answer.strip()
 
-        if self.session.query(Document) \
+        session = self.Session()
+
+        if session.query(Document) \
                 .filter_by(text=question, answer=answer).count():
             logger.info('Already here: {0} -> {1}'.format(question, answer))
             return
         logger.info('add document: {0} -> {1}'.format(question, answer))
 
-        grams = self._get_grams(question, make=True)
+        grams = self._get_grams(session, question, make=True)
 
         doc = Document(question, answer)
         doc.grams = list(grams)
-        self._recalc_idfs(grams)
+        self._recalc_idfs(session, grams)
 
-        self.session.add(doc)
-        self.session.commit()
-        self.session.close()
+        session.add(doc)
+        session.commit()
 
     def get_best_answer(self, query):
         """Get best answer to a question.
@@ -70,14 +71,15 @@ class DataCollection(object):
 
         """
         query = make_unicode(query)
+        session = self.Session()
 
-        grams = self._get_grams(query)
+        grams = self._get_grams(session, query)
         if not grams:
             raise NoAnswerError('Can not found answer')
 
         documents = set([doc for gram in grams for doc in gram.documents])
 
-        self._recalc_idfs(grams)
+        self._recalc_idfs(session, grams)
 
         idfs = dict((gram.gram, gram.idf) for gram in grams)
 
@@ -86,7 +88,7 @@ class DataCollection(object):
             for doc in documents)
         docs = dict((key, val) for (key, val) in docs.items() if val)
 
-        self.session.commit()
+        session.commit()
 
         try:
             max_ratio = max(docs.values())
@@ -99,7 +101,7 @@ class DataCollection(object):
         except ValueError:
             raise NoAnswerError('Can not found answer')
         finally:
-            self.session.close()
+            session.commit()
 
     def recreate_grams(self):
         """Re-create grams for database.
@@ -112,24 +114,26 @@ class DataCollection(object):
 
         """
 
-        for document in self.session.query(Document).all():
+        session = self.Session()
+
+        for document in session.query(Document).all():
             logger.info(document.text)
-            grams = self._get_grams(document.text, make=True)
+            grams = self._get_grams(session, document.text, make=True)
             document.grams = list(grams)
 
-        broken_links = self.session.query(Gram) \
+        broken_links = session.query(Gram) \
             .filter(~Gram.documents.any()).all()
         for gram in broken_links:
-            self.session.delete(gram)
+            session.delete(gram)
 
-        self.session.commit()
-        self.session.close()
+        session.commit()
 
     def recalc_idfs(self, grams=None):
-        self._recalc_idfs(grams)
-        self.session.close()
+        session = self.Session()
+        self._recalc_idfs(session, grams)
+        session.commit()
 
-    def _recalc_idfs(self, grams=None):
+    def _recalc_idfs(self, session, grams=None):
         """Re-calculate idfs for database.
 
         calculating idfs for gram is taking long time.
@@ -145,9 +149,9 @@ class DataCollection(object):
         """
 
         if not grams:
-            grams = self.session.query(Gram).all()
+            grams = session.query(Gram).all()
         for gram in grams:
-            gram.idf = self._get_idf(gram)
+            gram.idf = self._get_idf(session, gram)
 
     def get_count(self):
         """Get count of :class:`Document`.
@@ -156,32 +160,30 @@ class DataCollection(object):
         :type session: :class:`sqlalchemt.orm.Session`
 
         """
-        return self.session.query(Document).count()
+        return self.Session.query(Document).count()
 
-    def _get_grams(self, text, make=False):
+    def _get_grams(self, session, text, make=False):
         grams = set()
-        self.session.begin(subtransactions=True)
 
         if len(text) < GRAM_LENGTH:
-            gram_obj = self.session.query(Gram).filter_by(gram=text).first()
+            gram_obj = session.query(Gram).filter_by(gram=text).first()
             if gram_obj:
                 grams.add(gram_obj)
             elif make:
                 gram_obj = Gram(text)
-                self.session.add(gram_obj)
+                session.add(gram_obj)
                 grams.add(gram_obj)
         else:
             for i in range(len(text) - GRAM_LENGTH + 1):
                 gram = text[i:i+GRAM_LENGTH]
-                gram_obj = self.session.query(Gram).filter_by(gram=gram).first()
+                gram_obj = session.query(Gram).filter_by(gram=gram).first()
                 if gram_obj:
                     grams.add(gram_obj)
                 elif make:
                     gram_obj = Gram(gram)
-                    self.session.add(gram_obj)
+                    session.add(gram_obj)
                     grams.add(gram_obj)
 
-        self.session.commit()
         return grams
 
     @staticmethod
@@ -193,8 +195,8 @@ class DataCollection(object):
 
         return document.text.count(gram) + document.answer.count(gram)
 
-    def _get_idf(self, gram):
-        all_count = self.session.query(Document).count()
+    def _get_idf(self, session, gram):
+        all_count = session.query(Document).count()
         d_count = len(gram.documents)
         return math.log((all_count / (1.0 + d_count)) + 1)
 
