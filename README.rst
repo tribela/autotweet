@@ -78,7 +78,7 @@ You can configure Autotweet by editing ``~/.autotweetrc`` file.
 
    [tweet after death]
    message0 = This is message sent by auto tweet.
-   message1 = If you are reading this, I'm already died.
+   message1 = If you are reading this, I'm already dead.
 
 
 Links
