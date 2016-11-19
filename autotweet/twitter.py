@@ -18,6 +18,8 @@ try:
 except ImportError:
     from urllib.parse import urlencode
 
+from .compat import input
+
 
 __all__ = ('CONSUMER_KEY', 'CONSUMER_SECRET', 'authorize', 'strip_tweet')
 
@@ -67,7 +69,7 @@ def authorize():
     url = auth.get_authorization_url()
     print('Open this url on your webbrowser: {0}'.format(url))
     webbrowser.open(url)
-    pin = raw_input('Input verification number here: ').strip()
+    pin = input('Input verification number here: ').strip()
 
     token_key, token_secret = auth.get_access_token(verifier=pin)
 

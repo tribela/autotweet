@@ -15,7 +15,7 @@ import os
 import tweepy
 
 from . import logger_factory
-from .compat import to_unicode
+from .compat import to_unicode, input
 from .daemons import answer_daemon, import_timeline, learning_daemon
 from .learning import DataCollection
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
@@ -239,7 +239,7 @@ def main():
     try:
         db_url = config.get('database', 'db_url')
     except configparser.NoOptionError:
-        db_url = raw_input('db url: ').strip()
+        db_url = input('db url: ').strip()
         config.set('database', 'db_url', db_url)
 
     write_config(args.config, config)

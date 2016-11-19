@@ -1,8 +1,10 @@
 import sys
 
+PY3 = sys.version_info >= (3, 0, 0)
+
 
 def to_unicode(s):
-    if sys.version_info >= (3, 0, 0):
+    if PY3:
         if not isinstance(s, str):
             s = s.decode('utf-8')
 
@@ -11,3 +13,9 @@ def to_unicode(s):
             s = s.decode('utf-8')
 
     return s
+
+
+if PY3:
+    input = input
+else:
+    input = raw_input
