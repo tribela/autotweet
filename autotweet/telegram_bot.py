@@ -54,7 +54,7 @@ class TelegramBot(object):
             if ratio > self.threshold:
                 logger.info('{} -> {}'.format(question, answer))
                 update.message.reply_text(
-                    answer, reply_to_message_id=update.message.message_id)
+                    answer, quote=True)
         except NoAnswerError:
             logger.debug('No answer to {}'.format(question))
 
