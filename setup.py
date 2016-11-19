@@ -19,8 +19,9 @@ def readme():
 
 
 install_reqs = [
+    'python-telegram-bot>=5.2.0',
     'sqlalchemy>=0.9.6',
-    'tweepy>=2.3.0'
+    'tweepy>=2.3.0',
 ]
 if sys.version_info < (3, 2):
     install_reqs.append('futures')
