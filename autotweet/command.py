@@ -15,6 +15,7 @@ import os
 import tweepy
 
 from . import logger_factory
+from .compat import to_unicode
 from .daemons import answer_daemon, import_timeline, learning_daemon
 from .learning import DataCollection
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
@@ -85,8 +86,8 @@ def after_death_command(args, config):
 
 def add_command(args, config):
     db_url = config.get('database', 'db_url')
-    question = args.question.decode('utf-8')
-    answer = args.answer.decode('utf-8')
+    question = to_unicode(args.question)
+    answer = to_unicode(args.answer)
 
     data_collection = DataCollection(db_url)
 
@@ -95,7 +96,7 @@ def add_command(args, config):
 
 def get_command(args, config):
     db_url = config.get('database', 'db_url')
-    question = args.question.decode('utf-8')
+    question = to_unicode(args.question)
 
     data_collection = DataCollection(db_url)
     answer, ratio = data_collection.get_best_answer(question)
