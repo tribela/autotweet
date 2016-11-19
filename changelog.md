@@ -1,3 +1,10 @@
+0.4.0
+-----
+
+- Telegram bot support.
+- Unicode compatibility for Python 2/3.
+
+
 0.3.2
 -----
 
