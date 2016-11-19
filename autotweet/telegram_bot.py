@@ -6,7 +6,8 @@ This module provides abillities to connect to telegram.
 """
 from __future__ import unicode_literals
 
-from telegram.ext import CommandHandler, Updater, MessageHandler, Filters, BaseFilter
+from telegram.ext import (
+    BaseFilter, CommandHandler, Filters, MessageHandler, Updater)
 
 from .learning import DataCollection, NoAnswerError
 from .logger_factory import get_logger
@@ -20,8 +21,6 @@ class ReplyFilter(BaseFilter):
 Filters.reply = ReplyFilter()
 
 logger = get_logger(__name__)
-
-
 
 
 class TelegramBot(object):
@@ -38,7 +37,8 @@ class TelegramBot(object):
             self.enable_answering()
 
     def run(self):
-        logger.info('Starting with {} documents.'.format(self.data_collection.get_count()))
+        logger.info('Starting with {} documents.'.format(
+            self.data_collection.get_count()))
         self.updater.start_polling()
         self.updater.idle()
 
@@ -53,7 +53,8 @@ class TelegramBot(object):
             answer, ratio = self.data_collection.get_best_answer(question)
             if ratio > self.threshold:
                 logger.info('{} -> {}'.format(question, answer))
-                update.message.reply_text(answer, reply_to_message_id=update.message.message_id)
+                update.message.reply_text(
+                    answer, reply_to_message_id=update.message.message_id)
         except NoAnswerError:
             logger.debug('No answer to {}'.format(question))
 
@@ -63,11 +64,13 @@ class TelegramBot(object):
 
     def enable_learning(self):
         logger.debug('Enabling learning handler.')
-        self.dispatcher.add_handler(MessageHandler(Filters.reply, self.learning_handler))
+        self.dispatcher.add_handler(
+            MessageHandler(Filters.reply, self.learning_handler))
 
     def enable_answering(self):
         logger.debug('Enabling answer handler.')
-        self.dispatcher.add_handler(MessageHandler(Filters.text, self.answering_handler))
+        self.dispatcher.add_handler(
+            MessageHandler(Filters.text, self.answering_handler))
 
     def _make_updater(self, token):
         self.updater = Updater(token)

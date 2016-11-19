@@ -59,7 +59,8 @@ def telegram_bot_command(args, config):
     db_url = config.get('database', 'db_url')
     threshold = config.getfloat('answer', 'threshold')
 
-    start_bot(token, db_url, threshold, not args.no_learning, not args.no_answering)
+    start_bot(token, db_url, threshold,
+              not args.no_learning, not args.no_answering)
 
 
 def after_death_command(args, config):
