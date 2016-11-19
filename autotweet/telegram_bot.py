@@ -10,6 +10,7 @@ from telegram.ext import CommandHandler, Updater, MessageHandler, Filters, BaseF
 
 from .learning import DataCollection, NoAnswerError
 from .logger_factory import get_logger
+from .twitter import strip_tweet
 
 
 class ReplyFilter(BaseFilter):
@@ -42,8 +43,8 @@ class TelegramBot(object):
         self.updater.idle()
 
     def learning_handler(self, bot, update):
-        question = update.message.reply_to_message.text
-        answer = update.message.text
+        question = strip_tweet(update.message.reply_to_message.text)
+        answer = strip_tweet(update.message.text, remove_url=False)
         self.data_collection.add_document(question, answer)
 
     def answering_handler(self, bot, update):
