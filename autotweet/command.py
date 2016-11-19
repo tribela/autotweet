@@ -18,6 +18,7 @@ from . import logger_factory
 from .daemons import answer_daemon, import_timeline, learning_daemon
 from .learning import DataCollection
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
+from .telegram_bot import start_bot
 
 
 logger = logger_factory.get_logger('command')
@@ -51,6 +52,14 @@ def answer_command(args, config):
         threshold = None
 
     answer_daemon(token_string, db_url, args.stream, threshold=threshold)
+
+
+def telegram_bot_command(args, config):
+    token = config.get('auth', 'telegram_token')
+    db_url = config.get('database', 'db_url')
+    threshold = config.getfloat('answer', 'threshold')
+
+    start_bot(token, db_url, threshold, not args.no_learning, not args.no_answering)
 
 
 def after_death_command(args, config):
@@ -143,6 +152,16 @@ answer_parser.set_defaults(function=answer_command)
 answer_parser.add_argument('-s', '--stream',
                            help='use streaming to collect tweet',
                            action='store_true', default=False)
+
+telegram_bot_parser = subparsers.add_parser(
+    'telegram', help='Start telegram bot.')
+telegram_bot_parser.set_defaults(function=telegram_bot_command)
+telegram_bot_parser.add_argument('-L', '--no-learning',
+                                 help='Turn off learning',
+                                 action='store_true', default=False)
+telegram_bot_parser.add_argument('-A', '--no-answering',
+                                 help='Turn off answering',
+                                 action='store_true', default=False)
 
 after_death_parser = subparsers.add_parser(
     'after_death',
