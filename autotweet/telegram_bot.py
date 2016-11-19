@@ -41,6 +41,7 @@ class TelegramBot(object):
     def run(self):
         logger.info('Starting with {} documents.'.format(
             self.data_collection.get_count()))
+        self.me = self.updater.bot.get_me()
         self.updater.start_polling()
         self.updater.idle()
 
@@ -56,12 +57,11 @@ class TelegramBot(object):
             if (ratio > self.threshold or
                     self._is_necessary_to_reply(bot, update)):
                 logger.info('{} -> {}'.format(question, answer))
-                update.message.reply_text(
-                    answer, quote=True)
+                update.message.reply_text(answer)
         except NoAnswerError:
+            logger.debug('No answer to {}'.format(update.message.text))
             if self._is_necessary_to_reply(bot, update):
                 update.message.reply_text(r'¯\_(ツ)_/¯')
-            logger.debug('No answer to {}'.format(question))
 
     def leave_handler(self, bot, update):
         logger.info('Leave from chat {}'.format(update.message.chat_id))
@@ -84,16 +84,14 @@ class TelegramBot(object):
     def _init_handlers(self):
         self.dispatcher.add_handler(CommandHandler('leave', self.leave_handler))
 
-    @staticmethod
-    def _is_necessary_to_reply(bot, update):
+    def _is_necessary_to_reply(self, bot, update):
         message = update.message
 
         if message.chat.type == 'private':
             logger.debug('{} type private'.format(message.text))
             return True
 
-        my_name = bot.get_me().username
-        matched = re.search('@{}\b'.format(my_name), message.text)
+        matched = re.search(r'@{}\b'.format(self.me.username), message.text)
         result = bool(matched)
         if result:
             logger.debug('{} mentioned me.'.format(message.text))
