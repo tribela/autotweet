@@ -2,6 +2,7 @@
 -----
 
 - Remove raw_input
+- Calculate cosine similarity correctly.
 
 
 0.4.0

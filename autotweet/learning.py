@@ -179,10 +179,11 @@ class DataCollection(object):
                 gram_obj = session.query(Gram).filter_by(gram=gram).first()
                 if gram_obj:
                     grams.add(gram_obj)
-                elif make:
+                else:
                     gram_obj = Gram(gram)
-                    session.add(gram_obj)
                     grams.add(gram_obj)
+                    if make:
+                        session.add(gram_obj)
 
         return grams
 
