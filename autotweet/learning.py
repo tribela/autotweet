@@ -3,6 +3,7 @@ import math
 import random
 import sys
 
+from .compat import PY3, to_unicode
 from .database import GRAM_LENGTH, Document, Gram, get_session
 from .logger_factory import get_logger
 
@@ -11,16 +12,15 @@ __all__ = ('NoAnswerError', 'DataCollection')
 logger = get_logger('learning')
 
 
-def make_unicode(string):
-    if sys.version_info >= (3,):
-        return str(string)
+def make_string(string):
+    if PY3:
+        if isinstance(string, memoryview):
+            string = string.tobytes()
     else:
         if isinstance(string, buffer):
             string = str(string)
-        if not isinstance(string, unicode):
-            string = string.decode('utf-8')
 
-        return string
+    return to_unicode(string)
 
 
 class DataCollection(object):
@@ -70,7 +70,7 @@ class DataCollection(object):
         :raises: :class:`NoAnswerError` when can not found answer to a question
 
         """
-        query = make_unicode(query)
+        query = to_unicode(query)
         session = self.Session()
 
         grams = self._get_grams(session, query)
@@ -192,7 +192,7 @@ class DataCollection(object):
         if isinstance(gram, Gram):
             gram = gram.gram
 
-        gram = make_unicode(gram)
+        gram = make_string(gram)
 
         return document.text.count(gram) + document.answer.count(gram)
 
