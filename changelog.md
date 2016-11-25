@@ -1,7 +1,7 @@
 0.4.1
 -----
 
-- Remove raw_input
+- Remove raw_input.
 - Calculate cosine similarity correctly.
 
 
