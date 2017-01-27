@@ -149,9 +149,12 @@ class DataCollection(object):
         """
 
         if not grams:
-            grams = session.query(Gram).all()
+            grams = session.query(Gram)
         for gram in grams:
+            orig_idf = gram.idf
             gram.idf = self._get_idf(session, gram)
+            logger.debug('Recalculating {} {} -> {}'.format(
+                gram.gram, orig_idf, gram.idf))
 
     def get_count(self):
         """Get count of :class:`Document`.
