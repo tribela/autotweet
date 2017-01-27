@@ -1,3 +1,10 @@
+0.4.3
+-----
+
+- Logging when recalculating.
+- Minor enhancement.
+
+
 0.4.2
 -----
 
