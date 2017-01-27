@@ -13,6 +13,8 @@ Installation
 .. code-block:: console
 
    $ pip install autotweet
+   # Or with telegram bot
+   $ pip install 'autotweet[telegram]'
 
 
 Usage
@@ -57,6 +59,16 @@ You can add question/answer set manually.
 .. code-block:: console
 
    $ autotweet add 'Question' 'Answer'
+
+
+Telegram integration
+~~~~~~~~~~~~~~~~~~~~
+
+You can run a telegram bot with learned database.
+
+.. code-block:: console
+
+   $ autotweet telegram -h
 
 
 Configure
