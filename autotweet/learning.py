@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import math
 import random
-import sys
 
 from .compat import PY3, to_unicode
 from .database import GRAM_LENGTH, Document, Gram, get_session
@@ -17,7 +16,7 @@ def make_string(string):
         if isinstance(string, memoryview):
             string = string.tobytes()
     else:
-        if isinstance(string, buffer):
+        if isinstance(string, buffer):  # noqa
             string = str(string)
 
     return to_unicode(string)

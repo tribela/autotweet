@@ -18,4 +18,4 @@ def to_unicode(s):
 if PY3:
     input = input
 else:
-    input = raw_input
+    input = raw_input  # noqa

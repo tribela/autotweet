@@ -21,6 +21,7 @@ class ReplyFilter(BaseFilter):
     def filter(self, message):
         return bool(message.reply_to_message)
 
+
 Filters.reply = ReplyFilter()
 
 logger = get_logger(__name__)
