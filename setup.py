@@ -50,4 +50,16 @@ setup(
     install_requires=install_reqs,
     extras_require=extra_reqs,
     tests_require=['pytest >= 2.4.0'],
+    classifiers=[
+        'Development Status :: 5 - Production/Stable'
+        'Environment :: Console',
+        'Environment :: No Input/Output (Daemon)',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+        'Topic :: Communications :: Chat',
+        'Topic :: Utilities',
+    ]
 )
