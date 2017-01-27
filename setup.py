@@ -19,10 +19,14 @@ def readme():
 
 
 install_reqs = [
-    'python-telegram-bot>=5.2.0',
     'sqlalchemy>=0.9.6',
     'tweepy>=2.3.0',
 ]
+extra_reqs = {
+    'telegram': [
+        'python-telegram-bot>=5.2.0',
+    ],
+}
 if sys.version_info < (3, 2):
     install_reqs.append('futures')
 
@@ -44,5 +48,6 @@ setup(
     },
     packages=find_packages(exclude=['tests']),
     install_requires=install_reqs,
+    extras_require=extra_reqs,
     tests_require=['pytest >= 2.4.0'],
 )

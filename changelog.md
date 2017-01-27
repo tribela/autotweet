@@ -3,6 +3,7 @@
 
 - Logging when recalculating.
 - Minor enhancement.
+- Make telegram as optional requires.
 
 
 0.4.2

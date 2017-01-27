@@ -19,7 +19,6 @@ from .compat import to_unicode, input
 from .daemons import answer_daemon, import_timeline, learning_daemon
 from .learning import DataCollection
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
-from .telegram_bot import start_bot
 
 
 logger = logger_factory.get_logger('command')
@@ -56,6 +55,11 @@ def answer_command(args, config):
 
 
 def telegram_bot_command(args, config):
+    try:
+        from .telegram_bot import start_bot
+    except ImportError:
+        logger.error('python-telegram-bot is not installed')
+        exit(1)
     token = config.get('auth', 'telegram_token')
     db_url = config.get('database', 'db_url')
     threshold = config.getfloat('answer', 'threshold')
