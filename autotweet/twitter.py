@@ -87,7 +87,7 @@ def expand_url(status):
 
     txt = status.text
     for url in status.entities['urls']:
-        txt = txt.replace(url['url'], url['display_url'])
+        txt = txt.replace(url['url'], url['expanded_url'])
 
     return txt
 
