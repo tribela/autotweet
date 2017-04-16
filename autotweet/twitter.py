@@ -96,11 +96,20 @@ def expand_url(status):
     :rtype: :class:`str`
     """
 
-    txt = status.text
+    txt = get_full_text(status)
     for url in status.entities['urls']:
         txt = txt.replace(url['url'], url['expanded_url'])
 
     return txt
+
+
+def get_full_text(status):
+    if hasattr(status, 'extended_tweet'):
+        return status.extended_tweet.full_text
+    elif hasattr(status, 'full_text'):
+        return status.full_text
+
+    return status.text
 
 
 def strip_tweet(text, remove_url=True):

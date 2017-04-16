@@ -2,6 +2,7 @@
 -----
 
 - Add functionality to import by permalink.
+- Use extended mode to get status.
 
 
 0.4.4

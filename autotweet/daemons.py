@@ -12,7 +12,7 @@ import tweepy
 from .logger_factory import get_logger
 from .learning import NoAnswerError, DataCollection
 from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, expand_url,
-                      get_api, strip_tweet)
+                      get_api, get_full_text, strip_tweet)
 
 
 MY_CLIENT_NAME = 'learn your tweet'
@@ -29,7 +29,7 @@ def check_ignore(status):
         return True
     if status.source == MY_CLIENT_NAME:
         return True
-    if IGNORE_PATTERN.match(status.text):
+    if IGNORE_PATTERN.match(get_full_text(status)):
         return True
 
     return False
@@ -48,10 +48,14 @@ class CollectorMentionListener(tweepy.streaming.StreamListener):
             return True
 
         if status.user.id == self.me.id and status.in_reply_to_status_id:
-            original_status = self.api.get_status(status.in_reply_to_status_id)
+            original_status = self.api.get_status(
+                status.in_reply_to_status_id,
+                tweet_mode='extended'
+            )
 
-            question = strip_tweet(original_status.text)
-            answer = strip_tweet(expand_url(status.text), remove_url=False)
+            question = strip_tweet(get_full_text(original_status))
+            answer = strip_tweet(
+                expand_url(get_full_text(status)), remove_url=False)
 
             if question and answer:
                 self.data_collection.add_document(question, answer)
@@ -81,10 +85,13 @@ def collector_polling_timeline(api, db_url):
             if not status.in_reply_to_status_id:
                 continue
 
-            original_status = api.get_status(status.in_reply_to_status_id)
+            original_status = api.get_status(
+                status.in_reply_to_status_id,
+                tweet_mode='extended'
+            )
 
-            question = strip_tweet(original_status.text)
-            answer = strip_tweet(status.text, remove_url=False)
+            question = strip_tweet(get_full_text(original_status))
+            answer = strip_tweet(get_full_text(status), remove_url=False)
 
             if question and answer:
                 data_collection.add_document(question, answer)
@@ -106,12 +113,15 @@ def import_timeline(token, db_url, count):
             continue
 
         try:
-            original_status = api.get_status(status.in_reply_to_status_id)
+            original_status = api.get_status(
+                status.in_reply_to_status_id,
+                tweet_mode='extended'
+            )
         except:
             continue
 
-        question = strip_tweet(original_status.text)
-        answer = strip_tweet(status.text, remove_url=False)
+        question = strip_tweet(get_full_text(original_status))
+        answer = strip_tweet(get_full_text(status), remove_url=False)
 
         if question and answer:
             data_collection.add_document(question, answer)
@@ -168,7 +178,7 @@ def get_friends(api):
 
 def get_mentions(status, friends):
     user_name = status.user.screen_name
-    mentions = set(MENTION_PATTERN.findall(status.text))
+    mentions = set(MENTION_PATTERN.findall(get_full_text(status)))
     mentions.discard(user_name)
     mentions = mentions & friends
     mentions = [user_name] + list(mentions)
@@ -204,7 +214,7 @@ class AnswerMentionListener(tweepy.streaming.StreamListener):
 
         mentions = get_mentions(status, self.get_friends())
 
-        question = strip_tweet(status.text)
+        question = strip_tweet(get_full_text(status))
         status_id = status.id
 
         try:
@@ -260,7 +270,7 @@ def answer_polling_timeline(api, db_url, threshold=None):
             continue
 
         for status in statuses:
-            question = strip_tweet(status.text)
+            question = strip_tweet(get_full_text(status))
             mentions = get_mentions(status, friends)
 
             try:
