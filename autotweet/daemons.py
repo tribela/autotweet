@@ -12,7 +12,7 @@ import tweepy
 from .logger_factory import get_logger
 from .learning import NoAnswerError, DataCollection
 from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, expand_url,
-                      strip_tweet)
+                      get_api, strip_tweet)
 
 
 MY_CLIENT_NAME = 'learn your tweet'
@@ -91,12 +91,7 @@ def collector_polling_timeline(api, db_url):
 
 
 def import_timeline(token, db_url, count):
-    if not isinstance(token, OAuthToken):
-        token = OAuthToken.from_string(token)
-
-    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-    auth.set_access_token(token.key, token.secret)
-    api = tweepy.API(auth)
+    api = get_api(token)
 
     data_collection = DataCollection(db_url)
     me = api.me()
@@ -120,6 +115,28 @@ def import_timeline(token, db_url, count):
 
         if question and answer:
             data_collection.add_document(question, answer)
+
+
+def import_tweet(token, db_url, tweet_url):
+    api = get_api(token)
+    data_collection = DataCollection(db_url)
+    pattern = re.compile(r'https?://twitter.com/\w+/status/(?P<id>\d+)')
+
+    status = api.get_status(
+        pattern.search(tweet_url).group('id'),
+        tweet_mode='extended'
+    )
+    status_reply_to = api.get_status(
+        status.in_reply_to_status_id,
+        tweet_mode='extended'
+    )
+    text = status_reply_to.full_text
+    reply = status.full_text
+
+    data_collection.add_document(
+        strip_tweet(text),
+        strip_tweet(reply, remove_url=False)
+    )
 
 
 def learning_daemon(token, db_url, streaming=False):

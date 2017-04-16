@@ -76,6 +76,17 @@ def authorize():
     return OAuthToken(token_key, token_secret)
 
 
+def get_api(token):
+    if not isinstance(token, OAuthToken):
+        token = OAuthToken.from_string(token)
+
+    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    auth.set_access_token(token.key, token.secret)
+    api = tweepy.API(auth)
+
+    return api
+
+
 def expand_url(status):
     """Expand url on statuses.
 

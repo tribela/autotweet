@@ -16,7 +16,8 @@ import tweepy
 
 from . import logger_factory
 from .compat import to_unicode, input
-from .daemons import answer_daemon, import_timeline, learning_daemon
+from .daemons import (
+    answer_daemon, import_timeline, import_tweet, learning_daemon)
 from .learning import DataCollection
 from .twitter import authorize, CONSUMER_KEY, CONSUMER_SECRET, OAuthToken
 
@@ -121,7 +122,10 @@ def import_command(args, config):
     token_string = get_token_string(args.config, 'token')
     db_url = config.get('database', 'db_url')
 
-    import_timeline(token_string, db_url, args.count)
+    if args.url:
+        import_tweet(token_string, db_url, args.url)
+    else:
+        import_timeline(token_string, db_url, args.count)
 
 
 def recalc_command(args, config):
@@ -195,6 +199,7 @@ import_parser.set_defaults(function=import_command)
 import_parser.add_argument('-c', '--count',
                            help='Count for import last statuses',
                            type=int, default=1000)
+import_parser.add_argument('url', nargs='?', help='Tweet URL.')
 
 recalc_parser = subparsers.add_parser(
     'recalc', help='re-calculate idf for all grams')

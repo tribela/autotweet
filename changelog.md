@@ -1,3 +1,9 @@
+0.5.0
+-----
+
+- Add functionality to import by permalink.
+
+
 0.4.4
 -----
 
