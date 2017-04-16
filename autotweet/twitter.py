@@ -15,8 +15,10 @@ except ImportError:
     from html.parser import HTMLParser
 try:
     from urllib import urlencode
+    from urllib2 import urlopen
 except ImportError:
     from urllib.parse import urlencode
+    from urllib.request import urlopen
 
 from .compat import input
 
@@ -96,9 +98,18 @@ def expand_url(status):
     :rtype: :class:`str`
     """
 
-    txt = get_full_text(status)
-    for url in status.entities['urls']:
-        txt = txt.replace(url['url'], url['expanded_url'])
+    try:
+        txt = get_full_text(status)
+        for url in status.entities['urls']:
+            txt = txt.replace(url['url'], url['expanded_url'])
+    except:
+        # Manually replace
+        tco_pattern = re.compile(r'https://t.co/\S+')
+        urls = tco_pattern.findall(txt)
+        for url in urls:
+            with urlopen(url) as resp:
+                expanded_url = resp.url
+            txt = txt.replace(url, expanded_url)
 
     return txt
 
@@ -129,6 +140,8 @@ def strip_tweet(text, remove_url=True):
     """
     if remove_url:
         text = url_pattern.sub('', text)
+    else:
+        text = expand_url(text)
     text = mention_pattern.sub('', text)
     text = html_parser.unescape(text)
     text = text.strip()

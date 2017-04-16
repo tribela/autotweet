@@ -11,8 +11,8 @@ import tweepy
 
 from .logger_factory import get_logger
 from .learning import NoAnswerError, DataCollection
-from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, expand_url,
-                      get_api, get_full_text, strip_tweet)
+from .twitter import (CONSUMER_KEY, CONSUMER_SECRET, OAuthToken, get_api,
+                      get_full_text, strip_tweet)
 
 
 MY_CLIENT_NAME = 'learn your tweet'
@@ -54,8 +54,7 @@ class CollectorMentionListener(tweepy.streaming.StreamListener):
             )
 
             question = strip_tweet(get_full_text(original_status))
-            answer = strip_tweet(
-                expand_url(get_full_text(status)), remove_url=False)
+            answer = strip_tweet(get_full_text(status), remove_url=False)
 
             if question and answer:
                 self.data_collection.add_document(question, answer)
