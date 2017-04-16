@@ -51,7 +51,7 @@ setup(
     extras_require=extra_reqs,
     tests_require=['pytest >= 2.4.0'],
     classifiers=[
-        'Development Status :: 5 - Production/Stable'
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Environment :: No Input/Output (Daemon)',
         'License :: OSI Approved :: MIT License',
