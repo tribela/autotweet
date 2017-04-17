@@ -104,6 +104,7 @@ def expand_url(status):
             txt = txt.replace(url['url'], url['expanded_url'])
     except:
         # Manually replace
+        txt = status
         tco_pattern = re.compile(r'https://t.co/\S+')
         urls = tco_pattern.findall(txt)
         for url in urls:
