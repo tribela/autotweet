@@ -12,3 +12,12 @@ script:
 - autotweet -h > /dev/null
 after_success:
 - coveralls
+deploy:
+  provider: pypi
+  user: kjwon15
+  password:
+    secure: pA4UanWHftEj9gfDqE2dM7yZMXx7baCRo4qzzNs61QqdyKJN/D3/ctV3O3QUt9d5KZGkMsvtOchaKdGoyJSCBJ4PjH70thlTgyiEl5MkOuBVZwDo7Zl1zzKisoy+ZIO7QOLE4TtAfkK48eYTwtGNqM0BN23dMDLDNtNl10OnAfk=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: Kjwon15/autotweet
