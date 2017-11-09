@@ -3,6 +3,7 @@ python:
 - pypy
 - 2.7
 - 3.5
+- 3.6
 install:
 - pip install pytest pytest-cov pep8 coveralls;
 - pip install -e .
