@@ -117,7 +117,7 @@ def expand_url(status):
 
 def get_full_text(status):
     if hasattr(status, 'extended_tweet'):
-        return status.extended_tweet.full_text
+        return status.extended_tweet['full_text']
     elif hasattr(status, 'full_text'):
         return status.full_text
 

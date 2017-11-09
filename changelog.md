@@ -1,3 +1,9 @@
+0.5.3
+-----
+
+- Fix `autotweet.twitter.get_full_text`.
+
+
 0.5.2
 -----
 
